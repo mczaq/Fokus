@@ -164,7 +164,7 @@ export default function AdminChatPage() {
                   key={t.userId}
                   onClick={() => handleSelectThread(t)}
                   className={`w-full text-left p-4 flex flex-col gap-1 transition-colors select-none cursor-pointer ${
-                    isActive ? "bg-orange-50/50 border-l-4 border-l-orange-700" : "bg-white hover:bg-neutral-50/50"
+                    isActive ? "bg-neutral-100 border-l-4 border-l-black" : "bg-white hover:bg-neutral-50/50"
                   }`}
                 >
                   <div className="flex justify-between items-start w-full">
@@ -180,7 +180,7 @@ export default function AdminChatPage() {
                       {t.lastMessage}
                     </p>
                     {t.unreadCount > 0 && (
-                      <span className="bg-orange-750 text-white font-bold text-[8px] w-4 h-4 rounded-none flex items-center justify-center shrink-0">
+                      <span className="bg-black text-white font-bold text-[8px] w-4 h-4 rounded-none flex items-center justify-center shrink-0">
                         {t.unreadCount}
                       </span>
                     )}
@@ -225,14 +225,14 @@ export default function AdminChatPage() {
                       <div
                         className={`max-w-[70%] px-4 py-3 border ${
                           isMe
-                            ? "bg-orange-700 border-orange-750 text-white"
+                            ? "bg-black border-black text-white"
                             : "bg-[#FAF9F5] border-neutral-250 text-slate-800"
                         }`}
                       >
                         <p className="leading-relaxed break-words text-[11px] whitespace-pre-line">{msg.content}</p>
                         <span
                           className={`block text-[8px] mt-1.5 text-right ${
-                            isMe ? "text-orange-200" : "text-slate-400"
+                            isMe ? "text-neutral-300" : "text-slate-400"
                           }`}
                         >
                           {new Date(msg.createdAt).toLocaleString("id-ID", {
@@ -258,11 +258,11 @@ export default function AdminChatPage() {
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 placeholder={`Balas pesan ${selectedThread.userName}...`}
-                className="flex-1 px-4 py-2.5 border border-neutral-300 bg-white text-xs font-mono focus:outline-hidden focus:border-orange-700"
+                className="flex-1 px-4 py-2.5 border border-neutral-300 bg-white text-xs font-mono focus:outline-hidden focus:border-black"
               />
               <button
                 type="submit"
-                className="bg-neutral-950 hover:bg-neutral-900 text-white font-mono text-[9px] uppercase tracking-widest px-6 py-2.5 hover:bg-orange-700 transition-colors cursor-pointer shrink-0"
+                className="bg-neutral-950 hover:bg-neutral-800 text-white font-mono text-[9px] uppercase tracking-widest px-6 py-2.5 transition-colors cursor-pointer shrink-0"
               >
                 Kirim Balasan
               </button>

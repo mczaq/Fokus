@@ -85,7 +85,7 @@ export default function ReturnInspectionModal({
         {/* Header */}
         <div className="bg-slate-900 text-white p-5 border-b border-slate-800 flex justify-between items-center">
           <div>
-            <span className="text-[9px] font-mono uppercase tracking-widest text-orange-400 font-bold block">
+            <span className="text-[9px] font-mono uppercase tracking-widest text-neutral-400 font-bold block">
               FORM INSPEKSI PENGEMBALIAN BARANG
             </span>
             <h2 className="text-sm font-serif italic font-bold text-white">
@@ -131,7 +131,7 @@ export default function ReturnInspectionModal({
               </label>
 
               <label className={`flex items-center p-3 border rounded cursor-pointer transition-all ${
-                condition === "DAMAGED" ? "border-amber-500 bg-amber-50/70 text-amber-950 font-bold" : "border-slate-200 hover:bg-slate-50"
+                condition === "DAMAGED" ? "border-neutral-500 bg-neutral-50/70 text-neutral-950 font-bold" : "border-slate-200 hover:bg-slate-50"
               }`}>
                 <input
                   type="radio"
@@ -139,7 +139,7 @@ export default function ReturnInspectionModal({
                   value="DAMAGED"
                   checked={condition === "DAMAGED"}
                   onChange={() => setCondition("DAMAGED")}
-                  className="w-4 h-4 text-amber-600 accent-amber-600 mr-2.5"
+                  className="w-4 h-4 text-neutral-600 accent-neutral-600 mr-2.5"
                 />
                 <span>🔴 Ada Kerusakan (Cacat, Terbentur, Servis)</span>
               </label>
@@ -162,9 +162,9 @@ export default function ReturnInspectionModal({
 
           {/* Damage input form */}
           {condition === "DAMAGED" && (
-            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded space-y-3">
+            <div className="p-3.5 bg-neutral-50 border border-neutral-300 rounded space-y-3">
               <div>
-                <label className="text-[10px] uppercase font-bold text-amber-900 block mb-1">
+                <label className="text-[10px] uppercase font-bold text-neutral-900 block mb-1">
                   Catatan Rincian Kerusakan:
                 </label>
                 <textarea
@@ -172,12 +172,12 @@ export default function ReturnInspectionModal({
                   value={damageNotes}
                   onChange={(e) => setDamageNotes(e.target.value)}
                   placeholder="Contoh: Lensa gores bagian depan, tombol shutter macet..."
-                  className="w-full input-modern text-xs bg-white p-2 border border-amber-300"
+                  className="w-full input-modern text-xs bg-white p-2 border border-neutral-300"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-amber-900 block mb-1">
+                <label className="text-[10px] uppercase font-bold text-neutral-900 block mb-1">
                   Estimasi Biaya Perbaikan (Rp):
                 </label>
                 <input
@@ -185,7 +185,7 @@ export default function ReturnInspectionModal({
                   value={damageFee}
                   onChange={(e) => setDamageFee(Number(e.target.value))}
                   placeholder="Masukkan estimasi biaya perbaikan..."
-                  className="w-full input-modern text-xs bg-white p-2 border border-amber-300 font-bold"
+                  className="w-full input-modern text-xs bg-white p-2 border border-neutral-300 font-bold"
                 />
               </div>
             </div>

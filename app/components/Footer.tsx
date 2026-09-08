@@ -30,7 +30,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#0B0C0E] text-slate-300 pt-24 pb-12 border-t border-neutral-900 relative overflow-hidden">
       {/* Decorative blurred background shapes */}
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-orange-950/10 blur-3xl pointer-events-none -translate-x-1/2"></div>
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-neutral-900/30 blur-3xl pointer-events-none -translate-x-1/2"></div>
       <div className="absolute top-0 right-1/4 w-80 h-80 rounded-full bg-neutral-900/20 blur-3xl pointer-events-none translate-x-1/2"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -38,11 +38,11 @@ export default function Footer() {
         {/* Top Section: CTA & Newsletter */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-16 border-b border-neutral-900">
           <div className="lg:col-span-7 flex flex-col justify-center">
-            <span className="text-orange-700 font-mono tracking-[0.2em] uppercase text-[10px] font-bold mb-3 block">
+            <span className="text-neutral-400 font-mono tracking-[0.2em] uppercase text-[10px] font-bold mb-3 block">
               Mari Berkolaborasi
             </span>
             <h3 className="text-3xl sm:text-4xl lg:text-5xl font-light text-white font-serif leading-tight max-w-xl">
-              Tangkap <span className="italic font-bold text-orange-600">kreativitas</span> Anda berikutnya bersama kami.
+              Tangkap <span className="italic font-bold text-white border-b-2 border-white/50 pb-0.5">kreativitas</span> Anda berikutnya bersama kami.
             </h3>
           </div>
 
@@ -50,15 +50,15 @@ export default function Footer() {
             <div className="bg-[#121316] border border-neutral-800 p-6 md:p-8 relative viewfinder-box rounded-none">
               {/* Custom Viewfinder Corners inside Newsletter Card */}
               <div className="viewfinder-corners-bottom"></div>
-              <div className="viewfinder-center text-orange-600"></div>
+              <div className="viewfinder-center text-white"></div>
 
               <h4 className="text-xs font-mono uppercase tracking-widest text-white mb-2">Ikuti Buletin Kami</h4>
               <p className="text-[11px] text-slate-400 font-mono uppercase tracking-wider mb-6">Dapatkan tips fotografi, update promo, &amp; info studio terhangat.</p>
 
               {subscribed ? (
-                <div className="flex items-center gap-3 bg-neutral-900/60 border border-green-950/40 p-4 animate-fade-up">
-                  <div className="w-6 h-6 rounded-full border border-green-500 flex items-center justify-center shrink-0">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3">
+                <div className="flex items-center gap-3 bg-neutral-900/60 border border-neutral-700 p-4 animate-fade-up">
+                  <div className="w-6 h-6 rounded-full border border-white flex items-center justify-center shrink-0">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3">
                       <path d="M20 6 9 17l-5-5"></path>
                     </svg>
                   </div>
@@ -76,13 +76,13 @@ export default function Footer() {
                       placeholder="EMAIL@DOMAIN.COM"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-800 focus:border-orange-700 font-mono text-xs text-white placeholder-slate-600 px-4 py-3 outline-none transition-colors"
+                      className="w-full bg-neutral-900 border border-neutral-800 focus:border-white font-mono text-xs text-white placeholder-slate-600 px-4 py-3 outline-none transition-colors"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="bg-orange-700 hover:bg-orange-600 text-white font-mono text-xs uppercase tracking-widest px-6 py-3 transition-all duration-300 disabled:opacity-50 shrink-0 flex items-center justify-center gap-2 group cursor-pointer"
+                    className="bg-white hover:bg-neutral-200 text-black font-mono text-xs font-bold uppercase tracking-widest px-6 py-3 transition-all duration-300 disabled:opacity-50 shrink-0 flex items-center justify-center gap-2 group cursor-pointer shadow-sm"
                   >
                     <span>{loading ? "MEMPROSES..." : "DAFTAR"}</span>
                     {!loading && (
@@ -132,7 +132,7 @@ export default function Footer() {
 
           {/* Links 1 */}
           <div className="lg:col-span-2">
-            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-orange-700">Layanan</h4>
+            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-white">Layanan</h4>
             <ul className="space-y-4">
               {[
                 { label: "Sewa Kamera & Lensa", href: "/katalog" },
@@ -143,7 +143,7 @@ export default function Footer() {
               ].map((l, i) => (
                 <li key={i}>
                   <Link href={l.href} className="group flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-all duration-300">
-                    <span className="text-orange-600 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 font-mono text-[9px] font-bold">/</span>
+                    <span className="text-white opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 font-mono text-[9px] font-bold">/</span>
                     <span className="group-hover:translate-x-1 transition-transform duration-300">{l.label}</span>
                   </Link>
                 </li>
@@ -153,7 +153,7 @@ export default function Footer() {
 
           {/* Links 2 */}
           <div className="lg:col-span-2">
-            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-orange-700">Perusahaan</h4>
+            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-white">Perusahaan</h4>
             <ul className="space-y-4">
               {[
                 { label: "Tentang Kami", href: "/#kontak" },
@@ -163,7 +163,7 @@ export default function Footer() {
               ].map((l, i) => (
                 <li key={i}>
                   <Link href={l.href} className="group flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-all duration-300">
-                    <span className="text-orange-600 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 font-mono text-[9px] font-bold">/</span>
+                    <span className="text-white opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 font-mono text-[9px] font-bold">/</span>
                     <span className="group-hover:translate-x-1 transition-transform duration-300">{l.label}</span>
                   </Link>
                 </li>
@@ -173,7 +173,7 @@ export default function Footer() {
 
           {/* Links 3 */}
           <div className="lg:col-span-2">
-            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-orange-700">Bantuan</h4>
+            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-white">Bantuan</h4>
             <ul className="space-y-4">
               {[
                 { label: "Hubungi Kami", href: "/#kontak" },
@@ -183,7 +183,7 @@ export default function Footer() {
               ].map((l, i) => (
                 <li key={i}>
                   <Link href={l.href} className="group flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-all duration-300">
-                    <span className="text-orange-600 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 font-mono text-[9px] font-bold">/</span>
+                    <span className="text-white opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0 font-mono text-[9px] font-bold">/</span>
                     <span className="group-hover:translate-x-1 transition-transform duration-300">{l.label}</span>
                   </Link>
                 </li>
@@ -193,7 +193,7 @@ export default function Footer() {
 
           {/* Opening hours & contact info */}
           <div className="lg:col-span-2">
-            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-orange-700">Jam Operasional</h4>
+            <h4 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest font-mono relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-6 after:h-px after:bg-white">Jam Operasional</h4>
             <p className="text-xs font-mono text-slate-400 leading-relaxed mb-4">
               SENIN — MINGGU<br />
               08:00 — 22:00 WITA
@@ -248,7 +248,7 @@ export default function Footer() {
             {/* Back to Top */}
             <button
               onClick={scrollToTop}
-              className="w-8 h-8 border border-neutral-800 hover:border-orange-700 hover:text-orange-700 flex items-center justify-center text-slate-400 transition-all cursor-pointer group"
+              className="w-8 h-8 border border-neutral-800 hover:border-white hover:text-white flex items-center justify-center text-slate-400 transition-all cursor-pointer group"
               title="Kembali ke atas"
             >
               <svg

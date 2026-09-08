@@ -210,7 +210,7 @@ export default function PayFeeModal({
                   />
                   <label
                     htmlFor="fee-proof-upload"
-                    className="w-full border-2 border-dashed border-neutral-300 hover:border-orange-600 p-2.5 block text-center rounded text-[10px] font-mono font-bold text-slate-600 cursor-pointer bg-neutral-50"
+                    className="w-full border-2 border-dashed border-neutral-300 hover:border-black p-2.5 block text-center rounded text-[10px] font-mono font-bold text-slate-600 cursor-pointer bg-neutral-50 transition-colors"
                   >
                     {uploading ? "Mengunggah..." : "PILIH FOTO RESI STRUK TRANSFER"}
                   </label>

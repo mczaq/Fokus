@@ -62,7 +62,7 @@ function UserView({ user }: { user: User }) {
           <div className="text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1">
             Pesanan Aktif
           </div>
-          <div className="text-3xl font-bold font-serif italic text-orange-700">
+          <div className="text-3xl font-bold font-serif italic text-neutral-950">
             {loading ? "..." : activeCount}
           </div>
         </div>
@@ -104,7 +104,7 @@ function UserView({ user }: { user: User }) {
           </h2>
           <Link
             href="/dashboard/orders"
-            className="text-xs font-mono uppercase tracking-widest text-orange-700 hover:text-orange-950 font-bold"
+            className="text-xs font-mono uppercase tracking-widest text-neutral-950 hover:underline font-bold"
           >
             Lihat Semua
           </Link>
@@ -154,7 +154,7 @@ function UserView({ user }: { user: User }) {
                         className={`px-2 py-0.5 border text-[9px] font-mono uppercase tracking-widest font-bold ${
                           o.status.includes("Selesai")
                             ? "border-green-300 text-green-700 bg-green-50"
-                            : "border-orange-350 text-orange-700 bg-orange-50"
+                            : "border-neutral-300 text-neutral-900 bg-neutral-100"
                         }`}
                       >
                         {o.status}
@@ -229,7 +229,7 @@ function AdminView({ userRole }: { userRole: string }) {
           <div className="text-[9px] font-mono font-bold text-slate-400 mb-1 uppercase tracking-widest">
             Total Pendapatan
           </div>
-          <div className="text-2xl sm:text-3xl font-bold font-serif italic text-orange-700">
+          <div className="text-2xl sm:text-3xl font-bold font-serif italic text-neutral-950">
             {loading ? "..." : formatIDR(stats?.revenue || 0)}
           </div>
         </div>
@@ -239,7 +239,7 @@ function AdminView({ userRole }: { userRole: string }) {
           <div className="text-[9px] font-mono font-bold text-slate-400 mb-1 uppercase tracking-widest">
             Pesanan Menunggu
           </div>
-          <div className="text-3xl font-bold font-serif italic text-orange-700">
+          <div className="text-3xl font-bold font-serif italic text-neutral-950">
             {loading ? "..." : stats?.pendingOrders || 0}
           </div>
         </div>
@@ -282,7 +282,7 @@ function AdminView({ userRole }: { userRole: string }) {
             <button
               onClick={downloadCSV}
               disabled={loading || !stats?.transactions?.length}
-              className="text-[10px] font-mono font-bold text-orange-700 hover:text-orange-950 uppercase tracking-widest border border-orange-200 px-3 py-1 cursor-pointer disabled:opacity-50"
+              className="text-[10px] font-mono font-bold text-neutral-900 hover:text-black uppercase tracking-widest border border-neutral-300 hover:border-black px-3 py-1 cursor-pointer disabled:opacity-50 transition-colors"
             >
               Export CSV
             </button>
@@ -309,8 +309,8 @@ function AdminView({ userRole }: { userRole: string }) {
                   <svg className="w-full h-full" viewBox="0 0 500 200" preserveAspectRatio="none">
                     <defs>
                       <linearGradient id="chart-grad-minimal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="rgb(194, 65, 12)" stopOpacity="0.2" />
-                        <stop offset="100%" stopColor="rgb(194, 65, 12)" stopOpacity="0.0" />
+                        <stop offset="0%" stopColor="rgb(0, 0, 0)" stopOpacity="0.15" />
+                        <stop offset="100%" stopColor="rgb(0, 0, 0)" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
 
@@ -327,7 +327,7 @@ function AdminView({ userRole }: { userRole: string }) {
 
                     <polyline
                       fill="none"
-                      stroke="rgb(194, 65, 12)"
+                      stroke="rgb(10, 10, 10)"
                       strokeWidth="2.5"
                       points={points}
                     />
@@ -341,7 +341,7 @@ function AdminView({ userRole }: { userRole: string }) {
                             cx={x}
                             cy={y}
                             r="4.5"
-                            className="fill-orange-700 stroke-white stroke-[2px]"
+                            className="fill-neutral-900 stroke-white stroke-[2px]"
                           />
                           <text
                             x={x}
@@ -421,7 +421,7 @@ function AdminView({ userRole }: { userRole: string }) {
               </div>
               <div className="flex justify-between items-center text-[10px] font-mono">
                 <span className="text-slate-500 uppercase">Latency</span>
-                <span className="font-bold text-orange-700">24ms</span>
+                <span className="font-bold text-neutral-900">24ms</span>
               </div>
             </div>
           )}
@@ -444,7 +444,7 @@ function AdminView({ userRole }: { userRole: string }) {
             </div>
             <Link
               href="/dashboard/rentals"
-              className="text-xs font-mono uppercase tracking-widest text-orange-700 hover:text-orange-950 font-bold"
+              className="text-xs font-mono uppercase tracking-widest text-neutral-950 hover:underline font-bold"
             >
               Lihat Semua &rarr;
             </Link>
@@ -528,7 +528,7 @@ function AdminView({ userRole }: { userRole: string }) {
               </h2>
               <Link
                 href="/dashboard/payments"
-                className="text-[10px] font-mono uppercase tracking-widest text-orange-700 hover:text-orange-950 font-bold"
+                className="text-[10px] font-mono uppercase tracking-widest text-neutral-950 hover:underline font-bold"
               >
                 Log Payment
               </Link>
@@ -623,7 +623,7 @@ export default function DashboardPage() {
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-light font-serif text-slate-900 leading-tight">
-            Halo, <span className="italic font-bold text-orange-700">{user.name}</span>
+            Halo, <span className="italic font-bold text-neutral-950">{user.name}</span>
           </h1>
           <p className="text-slate-500 text-xs font-mono uppercase tracking-widest mt-1">
             {user.role === "user" && "Kelola pesanan dan aktivitas penyewaan Anda di sini."}

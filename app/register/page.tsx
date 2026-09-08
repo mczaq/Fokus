@@ -95,7 +95,7 @@ export default function RegisterPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-xl relative z-10">
         
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 border border-neutral-950 text-neutral-950 font-bold font-serif italic text-xl bg-white relative shadow-xs mb-6 group hover:border-orange-700">
+          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 border border-neutral-950 text-neutral-950 font-bold font-serif italic text-xl bg-white relative shadow-xs mb-6 group hover:border-neutral-700">
             <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-neutral-950"></span>
             <span className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-neutral-950"></span>
             <span className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-neutral-950"></span>
@@ -103,14 +103,14 @@ export default function RegisterPage() {
             F
           </Link>
           <h2 className="text-3xl font-light font-serif text-neutral-900 leading-tight">
-            Buat Akun <span className="italic font-bold text-orange-700">Baru</span>
+            Buat Akun <span className="italic font-bold text-neutral-950">Baru</span>
           </h2>
           <p className="text-slate-500 text-xs font-mono uppercase tracking-widest mt-2">Daftar untuk mengakses layanan dan dashboard</p>
         </div>
 
         <div className="bg-white border border-neutral-200 viewfinder-box p-8 rounded-none relative">
           <div className="viewfinder-corners-bottom"></div>
-          <div className="viewfinder-center text-orange-600"></div>
+          <div className="viewfinder-center text-neutral-400"></div>
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-100 flex items-start">
@@ -128,7 +128,7 @@ export default function RegisterPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-black rounded-none transition-colors"
                   placeholder="Masukkan nama"
                 />
               </div>
@@ -140,7 +140,7 @@ export default function RegisterPage() {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-black rounded-none transition-colors"
                   placeholder="08XXXXXXXXXX"
                 />
               </div>
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-black rounded-none transition-colors"
                   placeholder="nama@email.com"
                 />
               </div>
@@ -166,7 +166,7 @@ export default function RegisterPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-black rounded-none transition-colors"
                   placeholder="Minimal 6 karakter"
                 />
               </div>
@@ -179,7 +179,7 @@ export default function RegisterPage() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700 rounded-none transition-colors resize-none"
+                className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-black rounded-none transition-colors resize-none"
                 placeholder="Tuliskan alamat lengkap pengiriman/sewa..."
               />
             </div>
@@ -202,7 +202,7 @@ export default function RegisterPage() {
 
           <div className="mt-8 text-center text-xs font-mono uppercase tracking-widest">
             <span className="text-slate-500">Sudah punya akun? </span>
-            <Link href="/login" className="font-bold text-orange-700 hover:text-orange-950 transition-colors">
+            <Link href="/login" className="font-bold text-black underline hover:text-neutral-600 transition-colors">
               Masuk di sini
             </Link>
           </div>

@@ -50,9 +50,9 @@ export default function Portfolio() {
         
         <Reveal>
           <div className="text-center mb-12 max-w-2xl mx-auto">
-            <span className="text-orange-500 font-mono tracking-widest uppercase text-xs mb-3 block">GALERI KARYA</span>
+            <span className="text-neutral-400 font-mono tracking-widest uppercase text-xs mb-3 block">GALERI KARYA</span>
             <h2 className="text-3xl md:text-5xl font-light text-white font-serif leading-tight">
-              Karya Terbaik <span className="italic font-bold text-orange-500">Kami</span>
+              Karya Terbaik <span className="italic font-bold text-white border-b-2 border-white/40 pb-0.5">Kami</span>
             </h2>
             <p className="mt-4 text-slate-400 text-sm max-w-md mx-auto">
               Arahkan kursor (atau ketuk pada layar ponsel) untuk menyimulasikan efek **Autofokus Kamera** dan melihat detail telemetri lensa.
@@ -69,7 +69,7 @@ export default function Portfolio() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 border text-[10px] font-mono uppercase tracking-widest transition-all duration-300 cursor-pointer rounded-none ${
                   selectedCategory === cat
-                    ? "bg-orange-700 border-orange-700 text-white shadow-md shadow-orange-900/10"
+                    ? "bg-white border-white text-black font-bold shadow-md shadow-white/10"
                     : "bg-transparent border-neutral-800 text-slate-400 hover:text-white hover:border-neutral-700"
                 }`}
               >
@@ -85,10 +85,10 @@ export default function Portfolio() {
             <Reveal key={item.id || i} delay={i * 150} direction="up">
               <div 
                 onClick={() => setActiveLightbox(item)}
-                className="group relative aspect-square bg-[#121316] border border-neutral-800 viewfinder-box p-2 cursor-pointer transition-all duration-500 hover:border-emerald-600 lg:hover:-translate-y-1.5"
+                className="group relative aspect-square bg-[#121316] border border-neutral-800 viewfinder-box p-2 cursor-pointer transition-all duration-500 hover:border-white lg:hover:-translate-y-1.5"
               >
                 <div className="viewfinder-corners-bottom"></div>
-                <div className="viewfinder-center text-orange-500 lg:group-hover:text-emerald-500 transition-colors duration-500"></div>
+                <div className="viewfinder-center text-white/60 lg:group-hover:text-white transition-colors duration-500"></div>
 
                 <div className="w-full h-full relative overflow-hidden bg-neutral-950">
                   <Image
@@ -110,28 +110,28 @@ export default function Portfolio() {
                   {/* Focus brackets and target simulation (Desktop only to avoid sticking on mobile tap) */}
                   <div className="hidden lg:flex absolute inset-0 items-center justify-center pointer-events-none z-20">
                     {/* Left bracket */}
-                    <span className="absolute w-2.5 h-4 border-y border-l border-white/30 group-hover:border-emerald-500 group-hover:-translate-x-1.5 transition-all duration-500 -translate-x-4"></span>
+                    <span className="absolute w-2.5 h-4 border-y border-l border-white/30 group-hover:border-white group-hover:-translate-x-1.5 transition-all duration-500 -translate-x-4"></span>
                     {/* Right bracket */}
-                    <span className="absolute w-2.5 h-4 border-y border-r border-white/30 group-hover:border-emerald-500 group-hover:translate-x-1.5 transition-all duration-500 translate-x-4"></span>
+                    <span className="absolute w-2.5 h-4 border-y border-r border-white/30 group-hover:border-white group-hover:translate-x-1.5 transition-all duration-500 translate-x-4"></span>
                     {/* Center indicator dot */}
-                    <span className="w-1.5 h-1.5 bg-white/40 group-hover:bg-emerald-500 rounded-full transition-colors duration-500 animate-pulse"></span>
+                    <span className="w-1.5 h-1.5 bg-white/40 group-hover:bg-white rounded-full transition-colors duration-500 animate-pulse"></span>
                   </div>
 
                   {/* Telemetry info tag (Desktop only to prevent overlap) */}
                   <div className="hidden lg:flex absolute top-3 right-3 z-20 gap-2 text-[8px] font-mono tracking-wider text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-neutral-950/85 backdrop-blur-xs px-2 py-0.5 border border-neutral-800">
-                    <span className="text-orange-500">AF-S</span>
+                    <span className="text-white font-bold">AF-S</span>
                     <span>{item.settings.split(" • ")[0]}</span>
                     <span>{item.settings.split(" • ")[1]}</span>
                   </div>
 
                   {/* Category tag */}
-                  <div className="absolute top-3 left-3 z-20 text-[8px] font-mono tracking-widest text-white bg-orange-700 px-2 py-0.5 uppercase">
+                  <div className="absolute top-3 left-3 z-20 text-[8px] font-mono font-bold tracking-widest text-black bg-white px-2 py-0.5 uppercase">
                     {item.category}
                   </div>
 
                   {/* Hover Information overlay - visible on mobile by default, dynamic fade-in on desktop */}
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4 z-10">
-                    <span className="text-[9px] font-mono tracking-widest text-orange-400 uppercase">
+                    <span className="text-[9px] font-mono tracking-widest text-neutral-300 uppercase">
                       {item.category}
                     </span>
                     <h4 className="text-sm font-bold text-white tracking-tight font-serif italic mt-0.5">{item.title}</h4>
@@ -164,7 +164,7 @@ export default function Portfolio() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="viewfinder-corners-bottom"></div>
-            <div className="viewfinder-center text-orange-500"></div>
+            <div className="viewfinder-center text-white"></div>
 
             {/* Image section */}
             <div className="relative w-full h-[45vh] md:h-auto md:flex-1 bg-neutral-950 min-h-[250px] md:min-h-[450px]">
@@ -180,7 +180,7 @@ export default function Portfolio() {
             {/* Info section - Scrollable if content overflows on small heights */}
             <div className="w-full md:w-80 p-6 flex flex-col justify-between bg-[#1A1C21] border-t md:border-t-0 md:border-l border-neutral-800 overflow-y-auto max-h-[40vh] md:max-h-none">
               <div>
-                <span className="inline-block px-2.5 py-0.5 border border-neutral-800 text-[8px] font-mono uppercase tracking-widest text-orange-500 font-bold mb-3 md:mb-4">
+                <span className="inline-block px-2.5 py-0.5 border border-neutral-700 text-[8px] font-mono uppercase tracking-widest text-white font-bold mb-3 md:mb-4 bg-black">
                   {activeLightbox.category}
                 </span>
                 <h2 className="text-lg md:text-xl font-serif italic font-bold text-white leading-tight mb-2 md:mb-3">

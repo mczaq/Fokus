@@ -42,11 +42,11 @@ export default function PublicGalleryPage() {
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Reveal direction="up">
-              <span className="text-orange-700 font-mono tracking-widest uppercase text-xs mb-3 block">
+              <span className="text-neutral-900 font-mono tracking-widest uppercase text-xs mb-3 block">
                 GALERI KARYA &amp; VIDEO REELS
               </span>
               <h1 className="text-4xl md:text-5xl font-light text-slate-900 font-serif leading-tight">
-                Inspirasi Momen, Foto &amp; <span className="italic font-bold text-orange-700">Video 30s</span>
+                Inspirasi Momen, Foto &amp; <span className="italic font-bold text-neutral-950">Video 30s</span>
               </h1>
               <p className="text-slate-500 text-sm mt-4 max-w-md mx-auto">
                 Jelajahi portofolio fotografi dan cuplikan video sinematik 30 detik yang kami hasilkan dengan kualitas terbaik.
@@ -58,7 +58,7 @@ export default function PublicGalleryPage() {
           <Reveal direction="up" delay={150}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 bg-white p-6 border border-neutral-200 viewfinder-box rounded-none relative">
               <div className="viewfinder-corners-bottom"></div>
-              <div className="viewfinder-center text-orange-600"></div>
+              <div className="viewfinder-center text-neutral-900"></div>
 
               {/* Category Pills */}
               <div className="flex flex-wrap gap-2">
@@ -68,8 +68,8 @@ export default function PublicGalleryPage() {
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-4 py-2 border text-[10px] font-mono uppercase tracking-widest transition-all cursor-pointer rounded-none ${
                       selectedCategory === cat
-                        ? "bg-orange-700 border-orange-700 text-white"
-                        : "bg-white border-neutral-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        ? "bg-black border-black text-white font-bold"
+                        : "bg-white border-neutral-200 text-slate-600 hover:bg-neutral-100 hover:text-black hover:border-black"
                     }`}
                   >
                     {cat === "Video 30s" ? "📹 Video 30s" : cat}
@@ -90,7 +90,7 @@ export default function PublicGalleryPage() {
                   placeholder="CARI NAMA KARYA..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-3 py-2.5 border border-neutral-300 bg-white font-mono text-[10px] tracking-wider focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full pl-11 pr-3 py-2.5 border border-neutral-300 bg-white font-mono text-[10px] tracking-wider focus:outline-hidden focus:border-black rounded-none transition-colors"
                 />
               </div>
             </div>
@@ -117,7 +117,7 @@ export default function PublicGalleryPage() {
                       className="group relative border border-neutral-200 viewfinder-box p-3 bg-white rounded-none aspect-[4/3] cursor-pointer"
                     >
                       <div className="viewfinder-corners-bottom"></div>
-                      <div className="viewfinder-center text-orange-600"></div>
+                      <div className="viewfinder-center text-neutral-900"></div>
 
                       <div className="relative w-full h-full overflow-hidden bg-neutral-900 flex items-center justify-center">
                         {isVid ? (
@@ -131,7 +131,7 @@ export default function PublicGalleryPage() {
                             />
                             {/* Play Overlay Icon */}
                             <div className="absolute inset-0 flex items-center justify-center z-20">
-                              <div className="w-12 h-12 rounded-full bg-orange-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                              <div className="w-12 h-12 rounded-full bg-black/90 border border-white/30 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                                   <path d="M8 5v14l11-7z" />
                                 </svg>
@@ -188,7 +188,7 @@ export default function PublicGalleryPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="viewfinder-corners-bottom"></div>
-            <div className="viewfinder-center text-orange-600"></div>
+            <div className="viewfinder-center text-neutral-900"></div>
 
             {/* Image / Video Section */}
             <div className="relative flex-1 bg-neutral-950 min-h-[300px] md:min-h-[450px] flex items-center justify-center overflow-hidden">
@@ -214,7 +214,7 @@ export default function PublicGalleryPage() {
             {/* Info Section */}
             <div className="w-full md:w-80 p-6 flex flex-col justify-between bg-white border-t md:border-t-0 md:border-l border-neutral-200">
               <div>
-                <span className="inline-block px-2.5 py-0.5 border border-neutral-200 text-[8px] font-mono uppercase tracking-widest text-orange-700 font-bold mb-4">
+                <span className="inline-block px-2.5 py-0.5 border border-black bg-black text-[8px] font-mono uppercase tracking-widest text-white font-bold mb-4">
                   {isVideoItem(activeLightbox) ? "📹 VIDEO 30 DETIK" : activeLightbox.category}
                 </span>
                 <h2 className="text-xl font-serif italic font-bold text-slate-900 leading-tight mb-3">

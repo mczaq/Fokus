@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium Art-Gallery Editorial Color Variables */
-  --bg-main: #faf9f5;      /* Ivory / Alabaster Warm White */
+  /* Premium Monochrome Editorial (FOKUS STUDIO Official Aesthetic) */
+  --bg-main: #faf9f5;      /* Ivory / Warm Gallery White */
   --bg-white: #ffffff;
   
-  --text-main: #121316;    /* Soft Obsidian / Deep Charcoal */
-  --text-muted: #575a65;   /* Warm Slate Muted */
-  --text-light: #9ba0af;   /* Light Grey */
+  --text-main: #0a0a0a;    /* Crisp Obsidian / Solid Black */
+  --text-muted: #525252;   /* Neutral-600 Muted */
+  --text-light: #a3a3a3;   /* Neutral-400 Light Grey */
   
-  --primary: #c2410c;      /* Rust Terracotta (Indie Studio Focus Accent) */
-  --primary-hover: #9a3412; /* Deeper Terracotta */
+  --primary: #0a0a0a;      /* Solid Black Accent */
+  --primary-hover: #262626; /* Deep Charcoal Hover */
   
-  --border-light: #e7e6df;  /* Thin Warm Alabaster border */
-  --border-hover: #bab9b0;  /* Focused border */
+  --border-light: #e5e5e5;  /* Clean Minimal Border */
+  --border-hover: #0a0a0a;  /* Crisp Black Border Focus */
 }
 
 @theme inline {
@@ -67,7 +67,7 @@ body {
   position: absolute;
   width: 12px;
   height: 12px;
-  border-color: #27272a; /* Neutral-800 */
+  border-color: #171717; /* Neutral-900 */
   border-style: solid;
   pointer-events: none;
   z-index: 10;
@@ -106,7 +106,7 @@ body {
 .viewfinder-box:hover {
   border-color: var(--primary);
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -10px rgba(194, 65, 12, 0.15);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.12);
 }
 
 .viewfinder-box:hover::before,
@@ -132,7 +132,7 @@ body {
 }
 
 .viewfinder-box:hover .viewfinder-center {
-  opacity: 0.45;
+  opacity: 0.55;
   color: var(--primary);
 }
 
@@ -198,13 +198,13 @@ body {
   font-size: 14px;
   border-radius: 4px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 4px 0 rgba(194, 65, 12, 0.15);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
   cursor: pointer;
 }
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
-  box-shadow: 0 4px 12px 0 rgba(194, 65, 12, 0.25);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.22);
 }
 
 .btn-secondary {
@@ -224,7 +224,7 @@ body {
 
 .btn-secondary:hover {
   background-color: var(--text-main);
-  color: var(--bg-main);
+  color: var(--bg-white);
 }
 
 .input-modern {
@@ -240,7 +240,7 @@ body {
 
 .input-modern:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
 }
 
 .input-modern::placeholder {

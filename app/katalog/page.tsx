@@ -45,11 +45,11 @@ export default function PublicCatalogPage() {
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Reveal direction="up">
-              <span className="text-orange-700 font-mono tracking-widest uppercase text-xs mb-3 block">
+              <span className="text-neutral-500 font-mono tracking-widest uppercase text-xs mb-3 block">
                 RENTAL KAMERA &amp; AKSESORIS
               </span>
               <h1 className="text-4xl md:text-5xl font-light text-slate-900 font-serif leading-tight">
-                Katalog Alat Premium <span className="italic font-bold text-orange-700">Siap Pakai</span>
+                Katalog Alat Premium <span className="italic font-bold text-black border-b-2 border-black pb-0.5">Siap Pakai</span>
               </h1>
               <p className="text-slate-500 text-sm mt-4 max-w-md mx-auto">
                 Sewa kamera DSLR/Mirrorless, lensa GM/L-Series, lighting studio, dan gimbal stabilizer untuk mendukung kelancaran proyek visual Anda.
@@ -61,7 +61,7 @@ export default function PublicCatalogPage() {
           <Reveal direction="up" delay={150}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 bg-white p-6 border border-neutral-200 viewfinder-box rounded-none relative">
               <div className="viewfinder-corners-bottom"></div>
-              <div className="viewfinder-center text-orange-600"></div>
+              <div className="viewfinder-center text-neutral-900"></div>
 
               {/* Category Pills */}
               <div className="flex flex-wrap gap-2">
@@ -71,8 +71,8 @@ export default function PublicCatalogPage() {
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-4 py-2 border text-[10px] font-mono uppercase tracking-widest transition-all cursor-pointer rounded-none ${
                       selectedCategory === cat
-                        ? "bg-orange-700 border-orange-700 text-white"
-                        : "bg-white border-neutral-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        ? "bg-black border-black text-white font-bold"
+                        : "bg-white border-neutral-200 text-slate-600 hover:bg-neutral-100 hover:text-black hover:border-black"
                     }`}
                   >
                     {cat}
@@ -93,7 +93,7 @@ export default function PublicCatalogPage() {
                   placeholder="CARI KAMERA, LENSA, STABILIZER..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-3 py-2.5 border border-neutral-300 bg-white font-mono text-[10px] tracking-wider focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full pl-11 pr-3 py-2.5 border border-neutral-300 bg-white font-mono text-[10px] tracking-wider focus:outline-hidden focus:border-black rounded-none transition-colors"
                 />
               </div>
             </div>
@@ -114,9 +114,9 @@ export default function PublicCatalogPage() {
                 const inCart = cart.find((entry) => entry.equipment.id === item.id);
                 return (
                   <Reveal key={item.id} delay={i * 60} direction="up" className="h-full">
-                    <div className="bg-white border border-neutral-200 viewfinder-box p-3 rounded-none flex flex-col h-full relative group hover:border-neutral-400 cursor-default">
+                    <div className="bg-white border border-neutral-200 viewfinder-box p-3 rounded-none flex flex-col h-full relative group hover:border-black cursor-default">
                       <div className="viewfinder-corners-bottom"></div>
-                      <div className="viewfinder-center text-orange-600"></div>
+                      <div className="viewfinder-center text-neutral-900"></div>
 
                       {/* Image Header */}
                       <div className="h-48 w-full bg-slate-100 relative overflow-hidden shrink-0 border-b border-neutral-200">
@@ -148,7 +148,7 @@ export default function PublicCatalogPage() {
 
                         {/* Tag Badge */}
                         {item.tag && (
-                          <span className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 border border-orange-300 bg-white/90 text-[8px] font-mono font-bold text-orange-700 uppercase tracking-widest shadow-xs">
+                          <span className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 border border-black bg-black text-[8px] font-mono font-bold text-white uppercase tracking-widest shadow-xs">
                             {item.tag}
                           </span>
                         )}
@@ -161,7 +161,7 @@ export default function PublicCatalogPage() {
                             <div className="text-[9px] text-slate-400 font-mono uppercase tracking-widest">
                               {item.brand} &bull; {item.category}
                             </div>
-                            <div className="flex items-center gap-1 text-amber-600 font-mono text-[10px] font-bold">
+                            <div className="flex items-center gap-1 text-slate-800 font-mono text-[10px] font-bold">
                               <span>⭐</span>
                               <span>4.9</span>
                               <span className="text-slate-400 font-normal text-[9px]">(18)</span>
@@ -189,7 +189,7 @@ export default function PublicCatalogPage() {
                         <div className="pt-4 border-t border-neutral-100 flex items-center justify-between mt-auto">
                           <div>
                             <div className="text-[8px] text-slate-400 font-mono uppercase tracking-widest mb-0.5">Tarif Sewa</div>
-                            <div className="text-xs font-mono font-extrabold text-orange-700">
+                            <div className="text-xs font-mono font-extrabold text-neutral-950">
                               {formatIDR(item.pricePerDay)}
                               <span className="text-[9px] font-semibold text-slate-400">/hari</span>
                             </div>
@@ -221,7 +221,7 @@ export default function PublicCatalogPage() {
                               className={`px-3 py-1.5 border font-mono text-[9px] uppercase tracking-widest transition-colors flex items-center gap-1 cursor-pointer rounded-none ${
                                 item.available <= 0
                                   ? "bg-slate-100 border-neutral-200 text-slate-400 cursor-not-allowed"
-                                  : "bg-white border-neutral-900 text-neutral-900 hover:bg-orange-700 hover:border-orange-700 hover:text-white"
+                                  : "bg-black border-black text-white hover:bg-neutral-800"
                               }`}
                             >
                               {item.available <= 0 ? "Habis" : "+ Sewa"}

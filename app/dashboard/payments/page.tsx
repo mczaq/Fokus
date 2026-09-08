@@ -165,7 +165,7 @@ export default function PaymentsPage() {
                           log.status === "Settled"
                             ? "bg-green-100 text-green-700"
                             : log.status === "Pending"
-                            ? "bg-yellow-100 text-yellow-700"
+                            ? "bg-neutral-100 text-neutral-700"
                             : "bg-red-100 text-red-700"
                         }`}
                       >

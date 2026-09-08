@@ -167,7 +167,7 @@ function ServiceModal({ title, onClose, onSave, initial = {} }: ModalProps) {
 const CATEGORY_COLORS: Record<string, string> = {
   Wedding: "bg-pink-100 text-pink-700",
   Prewedding: "bg-rose-100 text-rose-700",
-  Product: "bg-orange-100 text-orange-700",
+  Product: "bg-neutral-100 text-neutral-800",
   Fashion: "bg-purple-100 text-purple-700",
   Event: "bg-indigo-100 text-indigo-700",
   Portrait: "bg-teal-100 text-teal-700",

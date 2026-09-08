@@ -352,10 +352,10 @@ export default function RentalMonitoringPage() {
         <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Menunggu Pickup</span>
-            <span className="text-3xl font-extrabold text-amber-600">{processingRentals}</span>
+            <span className="text-3xl font-extrabold text-neutral-700">{processingRentals}</span>
             <span className="text-xs text-slate-400 block mt-1">Lunas / Siap diserahkan</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-2xl bg-neutral-100 text-neutral-600 flex items-center justify-center font-bold">
             ⏳
           </div>
         </div>
@@ -501,7 +501,7 @@ export default function RentalMonitoringPage() {
                                 </p>
                                 <p className="text-slate-500 text-[11px]">
                                   {it.equipment?.brand || it.service?.category || ""} •{" "}
-                                  <span className="font-semibold text-orange-600">
+                                  <span className="font-semibold text-neutral-900">
                                     {it.quantity} {record.type === "STUDIO" ? "Sesi" : record.type === "SERVICE" ? "Paket" : "Unit"}
                                   </span>{" "}
                                   {record.type === "SERVICE" && it.service?.duration
@@ -576,7 +576,7 @@ export default function RentalMonitoringPage() {
                                 : record.status === "OVERDUE"
                                 ? "bg-rose-100 text-rose-700 border border-rose-300"
                                 : record.status === "PROCESSING" || record.status === "PENDING" || record.status === "CONFIRMED"
-                                ? "bg-amber-100 text-amber-700 border border-amber-200"
+                                ? "bg-neutral-100 text-neutral-700 border border-neutral-300"
                                 : record.status === "COMPLETED"
                                 ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
                                 : "bg-rose-50 text-rose-700 border border-rose-200"
@@ -622,7 +622,7 @@ export default function RentalMonitoringPage() {
                             Total: {formatIDR(record.totalAmount)}
                           </p>
                           {record.conditionStatus && record.conditionStatus !== "NORMAL" && (
-                            <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded">
+                            <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-neutral-200 text-neutral-900 border border-neutral-400 rounded">
                               ⚠️ {record.conditionStatus}
                             </span>
                           )}
@@ -842,7 +842,7 @@ export default function RentalMonitoringPage() {
                         {(record.cancelRequest || record.rescheduleRequest) && (
                           <button
                             onClick={() => setDetailFormRecord(record)}
-                            className="block px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 rounded-lg text-[10px] font-bold transition-colors ml-auto cursor-pointer"
+                            className="block px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 rounded-lg text-[10px] font-bold transition-colors ml-auto cursor-pointer"
                           >
                             🔍 Detail Form Request
                           </button>

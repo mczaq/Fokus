@@ -188,7 +188,7 @@ function GalleryModal({ title, onClose, onSave, initial = {} }: ModalProps) {
 
 const CATEGORY_COLORS: Record<string, string> = {
   Wedding: "bg-pink-100 text-pink-700",
-  Product: "bg-orange-100 text-orange-700",
+  Product: "bg-neutral-100 text-neutral-800",
   Fashion: "bg-purple-100 text-purple-700",
   Portrait: "bg-teal-100 text-teal-700",
   Event: "bg-indigo-100 text-indigo-700",
@@ -324,7 +324,7 @@ export default function ManageGalleryPage() {
                     className="w-full h-full object-cover"
                   />
                   {p.isFeatured && (
-                    <span className="absolute top-2 left-2 bg-yellow-400 text-slate-900 text-[9px] font-extrabold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                    <span className="absolute top-2 left-2 bg-black text-white text-[9px] font-extrabold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">
                       ★ Featured
                     </span>
                   )}
