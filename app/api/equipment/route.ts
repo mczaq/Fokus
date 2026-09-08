@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const equipment = await prisma.equipment.findMany({
@@ -16,6 +18,7 @@ export async function GET() {
       description: eq.description || "",
       specs: eq.specs || "",
       pricePerDay: eq.pricePerDay,
+      originalPrice: eq.originalPrice,
       stock: eq.stock,
       available: eq.available,
       tag: "", // Ignore tag since it's not in Prisma schema natively
@@ -47,9 +50,10 @@ export async function POST(request: Request) {
         brand: data.brand,
         type: data.category,
         specs: data.specs,
-        pricePerDay: data.pricePerDay,
-        stock: data.stock,
-        available: data.available,
+        pricePerDay: Number(data.pricePerDay || 0),
+        originalPrice: Number(data.originalPrice || 0),
+        stock: Number(data.stock || 1),
+        available: Number(data.available !== undefined ? data.available : (data.stock || 1)),
         image: data.image,
         isActive: data.isActive,
       },
@@ -63,6 +67,7 @@ export async function POST(request: Request) {
       description: created.description || "",
       specs: created.specs || "",
       pricePerDay: created.pricePerDay,
+      originalPrice: created.originalPrice,
       stock: created.stock,
       available: created.available,
       tag: "",
@@ -72,8 +77,8 @@ export async function POST(request: Request) {
     };
 
     return NextResponse.json(mapped, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating equipment:", error);
-    return NextResponse.json({ error: "Failed to create equipment" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to create equipment", details: error.message || String(error) }, { status: 500 });
   }
 }

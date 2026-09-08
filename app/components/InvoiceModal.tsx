@@ -31,6 +31,13 @@ interface InvoiceData {
   endDate?: string;
   user: InvoiceUser;
   items: InvoiceItem[];
+  lateFee?: number;
+  extensionFee?: number;
+  damageFee?: number;
+  lossFee?: number;
+  feeStatus?: string;
+  conditionStatus?: string;
+  damageNotes?: string;
 }
 
 interface InvoiceModalProps {
@@ -287,23 +294,62 @@ export default function InvoiceModal({ id, isOpen, onClose }: InvoiceModalProps)
                 {data.notes && (
                   <>
                     <h4 className="text-[8px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">CATATAN PESANAN:</h4>
-                    <p className="text-[10px] font-mono text-slate-500 italic leading-relaxed">{data.notes}</p>
+                    <p className="text-[10px] font-mono text-slate-500 italic leading-relaxed mb-4">{data.notes}</p>
                   </>
                 )}
+                {data.conditionStatus && data.conditionStatus !== "NORMAL" && (
+                  <div className="p-3 border border-red-200 bg-red-50 text-[10px] font-mono">
+                    <span className="font-bold text-red-750 block uppercase mb-1">HASIL INSPEKSI PENGEMBALIAN ({data.conditionStatus})</span>
+                    <p className="text-slate-700 leading-normal">Kerusakan/Kehilangan: <span className="italic">"{data.damageNotes || "-"}"</span></p>
+                  </div>
+                )}
               </div>
-              <div className="w-full sm:w-64 shrink-0 sm:text-right font-mono">
+              <div className="w-full sm:w-72 shrink-0 sm:text-right font-mono">
                 <div className="flex justify-between sm:justify-end gap-10 py-1.5 text-xs text-slate-500">
-                  <span>Subtotal:</span>
+                  <span>Subtotal Pesanan:</span>
                   <span className="text-slate-800">{formatIDR(data.totalAmount)}</span>
                 </div>
+                
+                {data.lateFee && data.lateFee > 0 ? (
+                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
+                    <span>Denda Terlambat:</span>
+                    <span>{formatIDR(data.lateFee)}</span>
+                  </div>
+                ) : null}
+                {data.damageFee && data.damageFee > 0 ? (
+                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
+                    <span>Denda Kerusakan:</span>
+                    <span>{formatIDR(data.damageFee)}</span>
+                  </div>
+                ) : null}
+                {data.lossFee && data.lossFee > 0 ? (
+                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
+                    <span>Denda Kehilangan:</span>
+                    <span>{formatIDR(data.lossFee)}</span>
+                  </div>
+                ) : null}
+                {data.extensionFee && data.extensionFee > 0 ? (
+                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
+                    <span>Biaya Perpanjangan:</span>
+                    <span>{formatIDR(data.extensionFee)}</span>
+                  </div>
+                ) : null}
+
                 <div className="flex justify-between sm:justify-end gap-10 py-1.5 text-xs text-slate-500">
                   <span>Pajak (0%):</span>
                   <span className="text-slate-800">Rp 0</span>
                 </div>
+                
                 <div className="flex justify-between sm:justify-end gap-10 py-3 border-t border-neutral-200 text-sm font-bold text-orange-700 mt-2">
                   <span>Total Tagihan:</span>
-                  <span>{formatIDR(data.totalAmount)}</span>
+                  <span>{formatIDR(data.totalAmount + (data.lateFee || 0) + (data.damageFee || 0) + (data.lossFee || 0) + (data.extensionFee || 0))}</span>
                 </div>
+                
+                {data.feeStatus && data.feeStatus !== "NONE" && (
+                  <div className="text-[10px] font-bold text-slate-500 mt-1">
+                    Status Denda: <span className={data.feeStatus === "PAID" ? "text-green-700" : "text-rose-700 animate-pulse"}>{data.feeStatus}</span>
+                  </div>
+                )}
               </div>
             </div>
 
