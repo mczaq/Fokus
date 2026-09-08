@@ -195,7 +195,7 @@ export default function OrdersPage() {
                                   : o.status.includes("Dibatalkan")
                                   ? "bg-rose-100 text-rose-700 border-rose-200"
                                   : o.status.includes("Menunggu")
-                                  ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                  ? "bg-neutral-50 text-neutral-700 border-neutral-300"
                                   : "bg-blue-50 text-blue-700 border-blue-200"
                               }`}
                             >
@@ -207,7 +207,7 @@ export default function OrdersPage() {
                               </span>
                             )}
                             {o.feeStatus === "PENDING_VERIFICATION" && (
-                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-amber-300 bg-amber-50 text-amber-700">
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-neutral-300 bg-neutral-50 text-neutral-700">
                                 ⏳ Verifikasi Pembayaran Denda
                               </span>
                             )}
@@ -382,7 +382,7 @@ export default function OrdersPage() {
                                           setExtendModalOrder(o);
                                           setIsExtendOpen(true);
                                         }}
-                                        className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 rounded text-[10px] font-mono font-bold transition-colors cursor-pointer"
+                                        className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 rounded text-[10px] font-mono font-bold transition-colors cursor-pointer"
                                       >
                                         ⏳ Extend Rental
                                       </button>
@@ -425,7 +425,7 @@ export default function OrdersPage() {
                             {isAdmin && (o.cancelRequest || o.rescheduleRequest) && (
                               <button
                                 onClick={() => setDetailModalOrder(o)}
-                                className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 rounded-lg text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
+                                className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 rounded-lg text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
                               >
                                 🔍 Lihat Detail Form
                               </button>
@@ -435,7 +435,7 @@ export default function OrdersPage() {
                                 setSelectedInvoiceId(o.id);
                                 setIsInvoiceOpen(true);
                               }}
-                              className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 hover:text-orange-700 transition-colors cursor-pointer"
+                              className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 hover:text-black transition-colors cursor-pointer"
                             >
                               Lihat Invoice
                             </button>

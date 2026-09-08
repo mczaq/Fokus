@@ -428,14 +428,14 @@ export default function BookingPage() {
                     bookingType === "equipment" ? "border-blue-500 bg-blue-50/30 ring-2 ring-blue-500/20" : "border-slate-200"
                   }`}
                 >
-                  <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-900 mb-4 group-hover:scale-110 transition-transform">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                   </div>
                   <h3 className="font-bold text-slate-950 text-lg mb-2">Sewa Alat &amp; Aksesoris</h3>
                   <p className="text-xs text-slate-500 leading-relaxed flex-1">
                     Sewa kamera DSLR/Mirrorless, lensa premium, stabilizer, tripod, dan kelengkapan lighting harian.
                   </p>
-                  <span className="text-xs font-bold text-orange-600 mt-4 block">Pilih Peralatan &rarr;</span>
+                  <span className="text-xs font-bold text-neutral-950 mt-4 block">Pilih Peralatan &rarr;</span>
                 </button>
 
               </div>
@@ -540,11 +540,11 @@ export default function BookingPage() {
                   
                   {/* Cart Summary Header */}
                   {cart.length > 0 && (
-                    <div className="mb-6 p-4 bg-orange-50 border border-orange-100 rounded-xl">
-                      <div className="text-xs font-bold text-orange-800 uppercase tracking-wider mb-2">Keranjang Sewa ({cart.length} item)</div>
+                    <div className="mb-6 p-4 bg-neutral-100 border border-neutral-200 rounded-xl">
+                      <div className="text-xs font-bold text-neutral-900 uppercase tracking-wider mb-2">Keranjang Sewa ({cart.length} item)</div>
                       <div className="space-y-2">
                         {cart.map((entry) => (
-                          <div key={entry.equipment.id} className="flex justify-between items-center bg-white p-2 rounded-lg border border-orange-100 text-xs">
+                          <div key={entry.equipment.id} className="flex justify-between items-center bg-white p-2 rounded-lg border border-neutral-200 text-xs">
                             <div className="flex items-center gap-2">
                               {entry.equipment.image ? (
                                 <img src={entry.equipment.image} alt={entry.equipment.name} className="w-8 h-8 object-cover rounded-md border border-slate-200 shrink-0" />
@@ -554,7 +554,7 @@ export default function BookingPage() {
                               <span className="font-bold text-slate-900">{entry.equipment.name} <span className="text-slate-400 font-normal">x{entry.quantity}</span></span>
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className="font-bold text-orange-600">{formatIDR(entry.equipment.pricePerDay * entry.quantity)}/hari</span>
+                              <span className="font-bold text-neutral-950">{formatIDR(entry.equipment.pricePerDay * entry.quantity)}/hari</span>
                               <button onClick={() => removeFromCart(entry.equipment.id)} className="text-red-500 hover:text-red-700 font-semibold font-mono cursor-pointer">Hapus</button>
                             </div>
                           </div>
@@ -594,7 +594,7 @@ export default function BookingPage() {
                     {filteredEquipment.map((eq) => {
                       const inCart = cart.find((entry) => entry.equipment.id === eq.id);
                       return (
-                        <div key={eq.id} className="overflow-hidden rounded-xl border border-slate-200 hover:border-orange-400 transition-all flex flex-col justify-between bg-white shadow-xs">
+                        <div key={eq.id} className="overflow-hidden rounded-xl border border-slate-200 hover:border-black transition-all flex flex-col justify-between bg-white shadow-xs">
                           <div>
                             {/* Equipment Image */}
                             <div className="h-32 w-full bg-slate-100 relative overflow-hidden border-b border-slate-100">
@@ -610,7 +610,7 @@ export default function BookingPage() {
                               </span>
                             </div>
                             <div className="p-3">
-                              <span className="text-[9px] font-bold text-orange-600 uppercase tracking-widest">{eq.brand} · {eq.category}</span>
+                              <span className="text-[9px] font-bold text-neutral-800 uppercase tracking-widest">{eq.brand} · {eq.category}</span>
                               <h4 className="font-bold text-xs text-slate-900 mt-0.5 line-clamp-1">{eq.name}</h4>
                               <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">{eq.description}</p>
                             </div>
@@ -619,7 +619,7 @@ export default function BookingPage() {
                           <div className="p-3 pt-0 flex items-center justify-between border-t border-slate-100 mt-2 pt-2">
                             <div>
                               <div className="text-[10px] text-slate-400">Harga/Hari</div>
-                              <div className="text-xs font-bold text-orange-600">{formatIDR(eq.pricePerDay)}</div>
+                              <div className="text-xs font-bold text-neutral-950">{formatIDR(eq.pricePerDay)}</div>
                             </div>
 
                             {inCart ? (
@@ -648,7 +648,7 @@ export default function BookingPage() {
                                 className={`text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${
                                   eq.available <= 0
                                     ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                                    : "bg-orange-500 hover:bg-orange-600 text-white shadow-xs"
+                                    : "bg-black hover:bg-neutral-800 text-white shadow-xs"
                                 }`}
                               >
                                 {eq.available <= 0 ? "Stok Habis" : "+ Tambah"}
@@ -679,10 +679,10 @@ export default function BookingPage() {
 
                   {/* Schedule list */}
                   {studioDate && (
-                    <div className="mb-6 p-4 bg-orange-50/50 border border-orange-200 rounded-none relative viewfinder-box">
+                    <div className="mb-6 p-4 bg-neutral-100 border border-neutral-250 rounded-none relative viewfinder-box">
                       <div className="viewfinder-corners-bottom"></div>
-                      <div className="text-[10px] font-bold text-orange-850 font-mono uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-orange-700 animate-pulse"></span>
+                      <div className="text-[10px] font-bold text-neutral-950 font-mono uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-black animate-pulse"></span>
                         Jadwal Terisi & Cooldown (30 Menit)
                       </div>
                       {loadingSchedules ? (
@@ -704,7 +704,7 @@ export default function BookingPage() {
                                 <div>
                                   Pesan: <strong className="text-slate-800">{b.startTime} - {b.endTime}</strong>
                                 </div>
-                                <div className="text-right text-orange-800 font-bold">
+                                <div className="text-right text-neutral-950 font-bold">
                                   Terblokir s/d: {blockEndStr}
                                 </div>
                               </div>
@@ -928,7 +928,7 @@ export default function BookingPage() {
                 {bookingType === "equipment" && (
                   <div className="space-y-4">
                     <div className="border-b border-slate-200 pb-4">
-                      <div className="text-[10px] font-bold text-orange-600 uppercase tracking-widest">Sewa Alat &amp; Aksesoris</div>
+                      <div className="text-[10px] font-bold text-neutral-950 uppercase tracking-widest">Sewa Alat &amp; Aksesoris</div>
                       <h3 className="text-base font-bold text-slate-950 mt-1">Daftar Peralatan yang Disewa:</h3>
                       <div className="space-y-2 mt-3">
                         {cart.map((entry) => (
@@ -972,14 +972,14 @@ export default function BookingPage() {
 
                     <div className="pt-4 border-t border-slate-200 flex justify-between items-center text-sm">
                       <span className="font-semibold text-slate-600">Total Tarif Sewa Alat</span>
-                      <strong className="text-lg font-extrabold text-orange-600">{formatIDR(getEquipTotalPrice())}</strong>
+                      <strong className="text-lg font-extrabold text-neutral-950">{formatIDR(getEquipTotalPrice())}</strong>
                     </div>
                   </div>
                 )}
 
               </div>
 
-              <div className="p-4 bg-yellow-50 text-yellow-800 border border-yellow-100 rounded-xl text-xs flex gap-2">
+              <div className="p-4 bg-neutral-50 text-neutral-700 border border-neutral-200 rounded-xl text-xs flex gap-2">
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>

@@ -193,7 +193,7 @@ export default function SchedulePage() {
             <button
               onClick={() => setViewMode("calendar")}
               className={`px-3 py-1.5 text-xs font-semibold font-mono uppercase tracking-wider transition-colors cursor-pointer ${
-                viewMode === "calendar" ? "bg-orange-700 text-white" : "bg-white text-slate-600 hover:bg-slate-50"
+                viewMode === "calendar" ? "bg-black text-white" : "bg-white text-slate-600 hover:bg-slate-50"
               }`}
             >
               Kalender
@@ -201,7 +201,7 @@ export default function SchedulePage() {
             <button
               onClick={() => setViewMode("table")}
               className={`px-3 py-1.5 text-xs font-semibold font-mono uppercase tracking-wider transition-colors cursor-pointer ${
-                viewMode === "table" ? "bg-orange-700 text-white" : "bg-white text-slate-600 hover:bg-slate-50"
+                viewMode === "table" ? "bg-black text-white" : "bg-white text-slate-600 hover:bg-slate-50"
               }`}
             >
               Tabel
@@ -214,12 +214,12 @@ export default function SchedulePage() {
               type="date"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
-              className="px-3 py-1.5 border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg bg-white shadow-xs focus:outline-hidden focus:border-orange-700"
+              className="px-3 py-1.5 border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg bg-white shadow-xs focus:outline-hidden focus:border-black"
             />
             {filterDate && (
               <button
                 onClick={() => setFilterDate("")}
-                className="text-xs text-orange-700 font-bold hover:text-orange-900"
+                className="text-xs text-neutral-950 font-bold hover:underline"
               >
                 Reset
               </button>
@@ -243,7 +243,7 @@ export default function SchedulePage() {
                       status.type === "red"
                         ? "bg-red-50/50 border-red-200"
                         : status.type === "yellow"
-                        ? "bg-amber-50/50 border-amber-200"
+                        ? "bg-neutral-50/50 border-neutral-300"
                         : "bg-emerald-50/50 border-emerald-200"
                     }`}
                   >
@@ -255,7 +255,7 @@ export default function SchedulePage() {
                           status.type === "red"
                             ? "bg-red-500 animate-pulse"
                             : status.type === "yellow"
-                            ? "bg-amber-500"
+                            ? "bg-neutral-500"
                             : "bg-emerald-500"
                         }`}
                       ></span>
@@ -264,7 +264,7 @@ export default function SchedulePage() {
                           status.type === "red"
                             ? "text-red-700"
                             : status.type === "yellow"
-                            ? "text-amber-800"
+                            ? "text-neutral-700"
                             : "text-emerald-700"
                         }`}
                       >
@@ -347,7 +347,7 @@ export default function SchedulePage() {
                                 : b.status === "IN_USE"
                                 ? "bg-red-50 text-red-700 border border-red-100"
                                 : b.status === "CONFIRMED"
-                                ? "bg-amber-50 text-amber-700 border border-amber-100"
+                                ? "bg-neutral-100 text-neutral-700 border border-neutral-200"
                                 : "bg-blue-50 text-blue-700 border border-blue-100"
                             }`}
                             title={`${b.user} - ${b.studio} (${b.startTime}-${b.endTime})`}
@@ -436,7 +436,7 @@ export default function SchedulePage() {
                                     : s.status === "COMPLETED"
                                     ? "bg-emerald-500"
                                     : s.status === "CONFIRMED"
-                                    ? "bg-amber-500"
+                                    ? "bg-neutral-500"
                                     : s.status === "CANCELLED"
                                     ? "bg-slate-350"
                                     : "bg-blue-500"
@@ -449,7 +449,7 @@ export default function SchedulePage() {
                                     : s.status === "COMPLETED"
                                     ? "text-emerald-700"
                                     : s.status === "CONFIRMED"
-                                    ? "text-amber-700"
+                                    ? "text-neutral-600"
                                     : s.status === "CANCELLED"
                                     ? "text-slate-400"
                                     : "text-blue-600"
@@ -514,7 +514,7 @@ export default function SchedulePage() {
                   required
                   value={editDate}
                   onChange={(e) => setEditDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-orange-700"
+                  className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-black"
                 />
               </div>
 
@@ -528,7 +528,7 @@ export default function SchedulePage() {
                     required
                     value={editStart}
                     onChange={(e) => setEditStart(e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-orange-700"
+                    className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-black"
                   />
                 </div>
                 <div>
@@ -540,7 +540,7 @@ export default function SchedulePage() {
                     required
                     value={editEnd}
                     onChange={(e) => setEditEnd(e.target.value)}
-                    className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-orange-700"
+                    className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-black"
                   />
                 </div>
               </div>
@@ -552,7 +552,7 @@ export default function SchedulePage() {
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-350 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700"
+                  className="w-full px-3 py-2 border border-neutral-350 bg-white font-mono text-xs focus:outline-hidden focus:border-black"
                 >
                   <option value="PENDING">PENDING</option>
                   <option value="CONFIRMED">CONFIRMED (Disetujui)</option>
@@ -570,7 +570,7 @@ export default function SchedulePage() {
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-orange-700 resize-none"
+                  className="w-full px-3 py-2 border border-neutral-350 font-mono text-xs focus:outline-hidden focus:border-black resize-none"
                   placeholder="Kebutuhan sewa..."
                 />
               </div>

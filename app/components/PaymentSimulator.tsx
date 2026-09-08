@@ -292,7 +292,7 @@ export default function PaymentSimulator({
 
           <div className="mt-8 pt-4 border-t border-neutral-100">
             <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 block mb-1">Total Pembayaran</span>
-            <span className="text-xl font-black text-orange-700">{formatIDR(totalAmount)}</span>
+            <span className="text-xl font-black text-neutral-950">{formatIDR(totalAmount)}</span>
           </div>
         </div>
 
@@ -311,7 +311,7 @@ export default function PaymentSimulator({
           ) : loading ? (
             /* Loading Screen */
             <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-              <div className="animate-spin inline-block w-8 h-8 border-[3px] border-orange-700 border-t-transparent rounded-full mb-3" />
+              <div className="animate-spin inline-block w-8 h-8 border-[3px] border-black border-t-transparent rounded-full mb-3" />
               <p className="text-xs font-mono uppercase tracking-widest text-slate-500">Memproses transaksi...</p>
             </div>
           ) : !method ? (
@@ -328,10 +328,10 @@ export default function PaymentSimulator({
                   {midtransToken && (
                     <button
                       onClick={payWithMidtrans}
-                      className="w-full flex items-center justify-between p-3.5 bg-orange-700 hover:bg-orange-850 text-white transition-colors text-left group cursor-pointer shadow-md"
+                      className="w-full flex items-center justify-between p-3.5 bg-black hover:bg-neutral-800 text-white transition-colors text-left group cursor-pointer shadow-md"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-6 bg-white flex items-center justify-center text-[8px] font-extrabold text-orange-700 border font-mono">MIDTRANS</div>
+                        <div className="w-10 h-6 bg-white flex items-center justify-center text-[8px] font-extrabold text-black border font-mono">MIDTRANS</div>
                         <span className="text-xs font-bold text-white">Bayar Online Aman (GoPay, ShopeePay, CC, dll)</span>
                       </div>
                       <span className="text-white group-hover:translate-x-1 transition-transform text-xs">&rarr;</span>
@@ -368,7 +368,7 @@ export default function PaymentSimulator({
                     className="w-full flex items-center justify-between p-3.5 bg-white border border-neutral-200 hover:border-slate-800 transition-colors text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-6 bg-slate-100 flex items-center justify-center text-[9px] font-extrabold text-orange-700 border font-mono">QRIS</div>
+                      <div className="w-10 h-6 bg-slate-100 flex items-center justify-center text-[9px] font-extrabold text-neutral-900 border font-mono">QRIS</div>
                       <span className="text-xs font-bold text-slate-800">QRIS (Gopay, OVO, QR Bank)</span>
                     </div>
                     <span className="text-slate-350 group-hover:text-slate-800 text-xs transition-colors">&rarr;</span>
@@ -470,7 +470,7 @@ export default function PaymentSimulator({
                 )}
 
                 {/* User Agreement / EULA Checklist Section */}
-                <div className="mt-4 p-3 bg-orange-50/70 border border-orange-200 rounded-lg space-y-2">
+                <div className="mt-4 p-3 bg-neutral-100 border border-neutral-250 rounded-lg space-y-2">
                   <div className="flex items-start gap-2">
                     <input
                       type="checkbox"
@@ -480,14 +480,14 @@ export default function PaymentSimulator({
                         setAgreementChecked(e.target.checked);
                         if (e.target.checked) setUploadError(null);
                       }}
-                      className="mt-0.5 w-4 h-4 text-orange-700 accent-orange-700 rounded border-neutral-300 cursor-pointer"
+                      className="mt-0.5 w-4 h-4 text-black accent-black rounded border-neutral-300 cursor-pointer"
                     />
                     <label htmlFor="agreement-checkbox" className="text-[11px] font-mono text-slate-800 leading-snug cursor-pointer select-none">
                       Saya telah membaca dan menyetujui{" "}
                       <button
                         type="button"
                         onClick={() => setIsEulaOpen(true)}
-                        className="text-orange-700 font-bold underline hover:text-orange-950 inline-block cursor-pointer"
+                        className="text-black font-bold underline hover:text-neutral-600 inline-block cursor-pointer"
                       >
                         EULA, Syarat &amp; Kontrak Rental
                       </button>
@@ -564,12 +564,12 @@ export default function PaymentSimulator({
                                 ? "border-neutral-200 bg-neutral-100/70 text-neutral-400 cursor-not-allowed opacity-60"
                                 : uploadError
                                 ? "border-rose-400 bg-rose-50/50 text-rose-700"
-                                : "border-neutral-300 hover:border-orange-500 text-slate-600"
+                                : "border-neutral-300 hover:border-black text-slate-600"
                             }`}
                           >
                             {uploadingProof ? (
-                              <span className="text-orange-600 font-mono text-[10px] flex items-center gap-1.5 font-bold">
-                                <span className="animate-spin inline-block w-3.5 h-3.5 border-2 border-orange-600 border-t-transparent rounded-full" />
+                              <span className="text-black font-mono text-[10px] flex items-center gap-1.5 font-bold">
+                                <span className="animate-spin inline-block w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full" />
                                 Mengunggah foto resi...
                               </span>
                             ) : (
@@ -594,7 +594,7 @@ export default function PaymentSimulator({
                           type="button"
                           disabled={!agreementChecked}
                           onClick={handleUseDemoReceipt}
-                          className="w-full py-2 px-3 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-[10px] font-mono font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full py-2 px-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 border border-neutral-300 rounded-lg text-[10px] font-mono font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <span>⚡</span>
                           <span>Gunakan Resi Simulasi Otomatis (Demo/Sandbox Instan)</span>
@@ -621,7 +621,7 @@ export default function PaymentSimulator({
                       ? "bg-slate-300 text-slate-500 cursor-not-allowed"
                       : method === "TUNAI" || proofImage
                       ? "bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
-                      : "bg-orange-700 hover:bg-orange-850 text-white font-bold"
+                      : "bg-black hover:bg-neutral-800 text-white font-bold"
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>

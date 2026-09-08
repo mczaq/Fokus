@@ -130,7 +130,7 @@ export default function FinancePage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-orange-700 block">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-900 block">
             FINANCIAL MONITORING &amp; LEDGER SPLIT
           </span>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
@@ -207,14 +207,14 @@ export default function FinancePage() {
             <span className="text-[10px] font-bold font-mono text-slate-400 uppercase tracking-wider block mb-1">
               Refund Pembatalan
             </span>
-            <span className="text-xl font-extrabold text-amber-600">
+            <span className="text-xl font-extrabold text-neutral-700">
               {formatIDR(summary.totalRefunds)}
             </span>
             <span className="text-[11px] text-slate-400 block mt-1">
               {summary.refundCount} pembatalan di-ACC
             </span>
           </div>
-          <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg">
+          <div className="w-11 h-11 rounded-xl bg-neutral-100 text-neutral-600 flex items-center justify-center font-bold text-lg">
             💸
           </div>
         </div>
@@ -244,7 +244,7 @@ export default function FinancePage() {
           onClick={() => setActiveTab("MAIN_RENTAL")}
           className={`pb-3 font-mono text-xs uppercase tracking-wider font-bold transition-all border-b-2 cursor-pointer ${
             activeTab === "MAIN_RENTAL"
-              ? "border-orange-700 text-orange-800"
+              ? "border-neutral-950 text-neutral-950"
               : "border-transparent text-slate-400 hover:text-slate-700"
           }`}
         >
@@ -285,7 +285,7 @@ export default function FinancePage() {
             <button
               onClick={() => setFilterCategory("REFUND")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
-                filterCategory === "REFUND" ? "bg-white text-amber-700 shadow-xs" : "text-slate-500"
+                filterCategory === "REFUND" ? "bg-white text-neutral-700 shadow-xs" : "text-slate-500"
               }`}
             >
               💸 Refund Keluar ({summary.refundCount})
@@ -452,7 +452,7 @@ export default function FinancePage() {
                       </td>
                       <td className="px-6 py-4 align-top space-y-1">
                         <span className={`inline-block px-2 py-0.5 text-[10px] font-mono font-bold rounded ${
-                          p.conditionStatus === "DAMAGED" ? "bg-amber-100 text-amber-900 border border-amber-300" :
+                          p.conditionStatus === "DAMAGED" ? "bg-neutral-200 text-neutral-900 border border-neutral-400" :
                           p.conditionStatus === "LOST" ? "bg-rose-100 text-rose-900 border border-rose-300" : "bg-emerald-100 text-emerald-900"
                         }`}>
                           {p.conditionStatus === "DAMAGED" ? "🔴 RUSAK" : p.conditionStatus === "LOST" ? "❌ HILANG (TOTAL LOSS)" : "🟢 NORMAL"}

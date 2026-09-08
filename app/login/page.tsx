@@ -92,7 +92,7 @@ export default function LoginPage() {
         <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
 
           <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center justify-center w-12 h-12 border border-neutral-950 text-neutral-950 font-bold font-serif italic text-xl bg-white relative shadow-xs mb-6 group hover:border-orange-700">
+            <Link href="/" className="inline-flex items-center justify-center w-12 h-12 border border-neutral-950 text-neutral-950 font-bold font-serif italic text-xl bg-white relative shadow-xs mb-6 group hover:border-neutral-700">
               <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-neutral-950"></span>
               <span className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-neutral-950"></span>
               <span className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-neutral-950"></span>
@@ -100,14 +100,14 @@ export default function LoginPage() {
               F
             </Link>
             <h2 className="text-3xl font-light font-serif text-neutral-900 leading-tight">
-              Selamat Datang <span className="italic font-bold text-orange-700">Kembali</span>
+              Selamat Datang <span className="italic font-bold text-neutral-950">Kembali</span>
             </h2>
             <p className="text-slate-500 text-xs font-mono uppercase tracking-widest mt-2">Masuk ke akun Anda untuk melanjutkan</p>
           </div>
 
           <div className="bg-white border border-neutral-200 viewfinder-box p-8 rounded-none relative">
             <div className="viewfinder-corners-bottom"></div>
-            <div className="viewfinder-center text-orange-600"></div>
+            <div className="viewfinder-center text-neutral-400"></div>
 
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-100 flex items-start">
@@ -124,7 +124,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-black rounded-none transition-colors"
                   placeholder="nama@email.com"
                 />
               </div>
@@ -132,14 +132,14 @@ export default function LoginPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-xs font-mono uppercase tracking-widest text-slate-700">Password</label>
-                  <a href="#" className="text-xs font-mono uppercase tracking-widest text-orange-700 hover:text-orange-950 transition-colors">Lupa sandi?</a>
+                  <a href="#" className="text-xs font-mono uppercase tracking-widest text-black underline hover:text-neutral-600 transition-colors">Lupa sandi?</a>
                 </div>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-orange-700 rounded-none transition-colors"
+                  className="w-full px-3 py-2 border border-neutral-300 bg-white font-mono text-xs focus:outline-hidden focus:border-black rounded-none transition-colors"
                   placeholder="••••••••"
                 />
               </div>
@@ -162,7 +162,7 @@ export default function LoginPage() {
 
             <div className="mt-8 text-center text-xs font-mono uppercase tracking-widest">
               <span className="text-slate-500">Belum punya akun? </span>
-              <Link href="/register" className="font-bold text-orange-700 hover:text-orange-950 transition-colors">
+              <Link href="/register" className="font-bold text-black underline hover:text-neutral-600 transition-colors">
                 Daftar sekarang
               </Link>
             </div>
@@ -176,7 +176,7 @@ export default function LoginPage() {
               className="w-full px-4 py-3 flex items-center justify-between text-xs font-mono uppercase tracking-widest text-slate-705 hover:bg-neutral-50 transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-2">
-                <svg className="w-3.5 h-3.5 text-orange-700" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-neutral-950" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
                 </svg>
                 Quick Access Demo Accounts
@@ -200,7 +200,7 @@ export default function LoginPage() {
                 
                 <div className="space-y-3">
                   {[
-                    { role: "ADMIN", desc: "Kelola order, grafik keuangan, & unduh CSV", email: "admin@fokus.id", pass: "admin123", badgeClass: "bg-orange-50 text-orange-700 border-orange-200" },
+                    { role: "ADMIN", desc: "Kelola order, grafik keuangan, & unduh CSV", email: "admin@fokus.id", pass: "admin123", badgeClass: "bg-neutral-900 text-white border-neutral-900" },
                     { role: "USER", desc: "Simulasi sewa alat, booking studio & pembayaran", email: "user@fokus.id", pass: "user123", badgeClass: "bg-slate-100 text-slate-700 border-slate-350" }
                   ].map((acc) => (
                     <div key={acc.role} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-neutral-200 bg-white gap-3">

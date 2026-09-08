@@ -68,11 +68,11 @@ export default function PublicServicesPage() {
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Reveal direction="up">
-              <span className="text-orange-700 font-mono tracking-widest uppercase text-xs mb-3 block">
+              <span className="text-neutral-500 font-mono tracking-widest uppercase text-xs mb-3 block">
                 JASA FOTOGRAFI &amp; PAKET
               </span>
               <h1 className="text-4xl md:text-5xl font-light text-slate-900 font-serif leading-tight">
-                Paket Layanan Visual <span className="italic font-bold text-orange-700">Profesional</span>
+                Paket Layanan Visual <span className="italic font-bold text-black border-b-2 border-black pb-0.5">Profesional</span>
               </h1>
               <p className="text-slate-500 text-sm mt-4 max-w-md mx-auto">
                 Temukan paket dokumentasi terbaik yang dirancang khusus untuk kebutuhan pernikahan, prewedding, produk, katalog komersial, maupun portret individu Anda.
@@ -90,8 +90,8 @@ export default function PublicServicesPage() {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-5 py-2.5 border text-[10px] font-mono uppercase tracking-widest transition-all cursor-pointer rounded-none ${
                     selectedCategory === cat
-                      ? "bg-orange-700 border-orange-700 text-white"
-                      : "bg-white border-neutral-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      ? "bg-black border-black text-white font-bold"
+                      : "bg-white border-neutral-200 text-slate-600 hover:bg-neutral-100 hover:text-black hover:border-black"
                   }`}
                 >
                   {cat}
@@ -112,7 +112,7 @@ export default function PublicServicesPage() {
                 <Reveal key={svc.id} delay={i * 100} direction="up" className="h-full">
                   <div className="bg-white border border-neutral-200 viewfinder-box p-6 rounded-none flex flex-col h-full justify-between relative">
                     <div className="viewfinder-corners-bottom"></div>
-                    <div className="viewfinder-center text-orange-600"></div>
+                    <div className="viewfinder-center text-neutral-900"></div>
 
                     <div>
                       {/* Badge / Category */}
@@ -133,7 +133,7 @@ export default function PublicServicesPage() {
 
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <h3 className="text-xl font-serif italic font-bold text-slate-900">{svc.name}</h3>
-                        <div className="flex items-center gap-1 text-amber-600 font-mono text-xs font-bold shrink-0">
+                        <div className="flex items-center gap-1 text-slate-800 font-mono text-xs font-bold shrink-0">
                           <span>⭐ 4.9</span>
                         </div>
                       </div>
@@ -143,7 +143,7 @@ export default function PublicServicesPage() {
                       {svc.includes && svc.includes.length > 0 && (
                         <div className="mb-8 bg-slate-50 p-4 border border-neutral-200">
                           <div className="text-[9px] font-bold text-slate-800 font-mono uppercase tracking-widest mb-4 flex items-center">
-                            <svg className="w-4 h-4 mr-2 text-orange-700 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 mr-2 text-neutral-950 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                             </svg>
                             Termasuk Dalam Paket
@@ -151,7 +151,7 @@ export default function PublicServicesPage() {
                           <ul className="space-y-3">
                             {svc.includes.map((inc, index) => (
                               <li key={index} className="flex items-start text-xs text-slate-600 font-medium">
-                                <svg className="w-4 h-4 text-orange-600 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 text-neutral-950 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                                 </svg>
                                 <span>{inc}</span>
@@ -166,7 +166,7 @@ export default function PublicServicesPage() {
                     <div className="pt-6 border-t border-slate-100 flex items-center justify-between mt-auto">
                       <div>
                         <div className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Mulai Dari</div>
-                        <div className="text-lg font-extrabold text-orange-700">{formatIDR(svc.priceStart)}</div>
+                        <div className="text-lg font-extrabold text-neutral-950 font-mono">{formatIDR(svc.priceStart)}</div>
                       </div>
                       <Link
                         href="/dashboard/booking"

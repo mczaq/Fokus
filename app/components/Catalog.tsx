@@ -18,12 +18,12 @@ export default function Catalog() {
         <Reveal direction="up">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
             <div>
-              <span className="text-orange-700 font-mono tracking-widest uppercase text-xs mb-3 block">KATALOG ALAT</span>
+              <span className="text-neutral-500 font-mono tracking-widest uppercase text-xs mb-3 block">KATALOG ALAT</span>
               <h2 className="text-3xl md:text-5xl font-light text-slate-900 font-serif leading-tight">
-                Peralatan <span className="italic font-bold text-orange-700">Premium</span>
+                Peralatan <span className="italic font-bold text-black border-b-2 border-black pb-0.5">Premium</span>
               </h2>
             </div>
-            <button className="flex items-center text-xs font-mono uppercase tracking-widest text-slate-800 bg-white border border-neutral-200 px-5 py-3 shadow-xs hover:bg-neutral-50 transition-colors">
+            <button className="flex items-center text-xs font-mono uppercase tracking-widest text-neutral-900 bg-white border border-neutral-300 px-5 py-3 shadow-xs hover:bg-neutral-900 hover:text-white transition-colors cursor-pointer">
               Unduh Pricelist Lengkap <span className="ml-2 font-normal">&darr;</span>
             </button>
           </div>
@@ -39,7 +39,7 @@ export default function Catalog() {
               <Reveal key={item.id} delay={i * 100} direction="up" className="h-full">
                 <div className="bg-white border border-neutral-200 viewfinder-box p-3 rounded-none flex flex-col h-full relative overflow-hidden group cursor-default">
                   <div className="viewfinder-corners-bottom"></div>
-                  <div className="viewfinder-center text-orange-600"></div>
+                  <div className="viewfinder-center text-neutral-900"></div>
 
                   {/* Image Header */}
                   <div className="h-48 w-full bg-slate-100 relative overflow-hidden shrink-0 border-b border-slate-100">
@@ -58,7 +58,7 @@ export default function Catalog() {
                         {item.category}
                       </span>
                       {item.tag && (
-                        <span className="inline-flex items-center px-2 py-0.5 text-[8px] font-mono font-bold bg-orange-700 text-white uppercase tracking-wider">
+                        <span className="inline-flex items-center px-2 py-0.5 text-[8px] font-mono font-bold bg-black text-white uppercase tracking-wider">
                           {item.tag}
                         </span>
                       )}
@@ -70,9 +70,9 @@ export default function Catalog() {
                     <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
                       <div>
                         <div className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Harga Sewa</div>
-                        <div className="text-sm font-extrabold text-orange-700">{formatIDR(item.pricePerDay)}/hari</div>
+                        <div className="text-sm font-extrabold text-neutral-950 font-mono">{formatIDR(item.pricePerDay)}/hari</div>
                       </div>
-                      <Link href="/katalog" className="w-8 h-8 rounded-none bg-slate-50 hover:bg-orange-600 text-slate-400 hover:text-white flex items-center justify-center transition-colors" aria-label="Detail">
+                      <Link href="/katalog" className="w-8 h-8 rounded-none bg-slate-50 hover:bg-black text-slate-400 hover:text-white flex items-center justify-center transition-colors" aria-label="Detail">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                       </Link>
                     </div>

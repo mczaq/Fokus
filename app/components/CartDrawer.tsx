@@ -152,7 +152,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       {/* Subtotal */}
                       <div className="text-right">
                         <span className="text-[10px] text-slate-400 block font-mono">Subtotal/hari</span>
-                        <span className="text-xs font-extrabold text-orange-700">{formatIDR(entry.equipment.pricePerDay * entry.quantity)}</span>
+                        <span className="text-xs font-extrabold text-neutral-950 font-mono">{formatIDR(entry.equipment.pricePerDay * entry.quantity)}</span>
                       </div>
                     </div>
                   </div>
@@ -175,11 +175,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     placeholder="Contoh: FOKUS10, PROMO50K"
                     value={promoInput}
                     onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                    className="flex-1 px-3 py-1.5 bg-white border border-neutral-300 text-xs font-mono tracking-wider focus:outline-hidden focus:border-orange-700"
+                    className="flex-1 px-3 py-1.5 bg-white border border-neutral-300 text-xs font-mono tracking-wider focus:outline-hidden focus:border-black"
                   />
                   <button
                     onClick={handleApplyPromo}
-                    className="px-3 py-1.5 bg-slate-900 text-white font-mono text-[10px] uppercase font-bold tracking-wider hover:bg-orange-700 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-black text-white font-mono text-[10px] uppercase font-bold tracking-wider hover:bg-neutral-800 transition-colors cursor-pointer"
                   >
                     Gunakan
                   </button>
@@ -218,7 +218,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <div className="flex justify-between items-baseline pt-1 border-t border-neutral-200">
                   <span className="text-xs text-slate-900 font-bold font-mono uppercase tracking-wider">Total Estimasi</span>
                   <div className="text-right">
-                    <span className="text-lg font-extrabold text-orange-700">
+                    <span className="text-lg font-extrabold text-neutral-950 font-mono">
                       {formatIDR(subtotalPerDay - (appliedPromo?.discountAmount || 0))}
                     </span>
                     <span className="text-[9px] text-slate-400 block font-mono mt-0.5">*Belum termasuk durasi hari</span>

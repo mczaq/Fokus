@@ -13,16 +13,16 @@ export default function Hero() {
           {/* Left Text */}
           <div className="lg:w-1/2">
             <Reveal direction="up" delay={0}>
-              <div className="inline-flex items-center px-4 py-2 bg-white border border-neutral-200 shadow-xs text-neutral-800 text-xs font-mono uppercase tracking-widest mb-8">
-                <span className="flex w-1.5 h-1.5 rounded-full bg-orange-600 mr-2.5 animate-pulse"></span>
+              <div className="inline-flex items-center px-4 py-2 bg-white border border-neutral-300 shadow-xs text-neutral-900 text-xs font-mono uppercase tracking-widest mb-8">
+                <span className="flex w-1.5 h-1.5 rounded-full bg-black mr-2.5"></span>
                 Studio Fotografi &amp; Rental Alat
               </div>
             </Reveal>
 
             <Reveal direction="up" delay={100}>
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light text-slate-900 tracking-tight mb-8 leading-[1.08] font-serif">
-                Tangkap <span className="italic font-bold text-orange-700">momen</span>, <br />
-                lestarikan <span className="italic font-bold">kenangan.</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light text-neutral-950 tracking-tight mb-8 leading-[1.08] font-serif">
+                Tangkap <span className="italic font-bold text-black border-b-2 border-black pb-0.5">momen</span>, <br />
+                lestarikan <span className="italic font-bold text-neutral-900">kenangan.</span>
               </h1>
             </Reveal>
 
@@ -67,11 +67,11 @@ export default function Hero() {
           {/* Right Image */}
           <div className="lg:w-1/2 relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
             <Reveal direction="left" delay={200} className="w-full h-full">
-              <div className="absolute inset-0 bg-orange-100/50 transform rotate-1 scale-98 transition-transform duration-700 opacity-60"></div>
+              <div className="absolute inset-0 bg-neutral-200/60 transform rotate-1 scale-98 transition-transform duration-700 opacity-60"></div>
 
               <div className="w-full h-full relative bg-white p-3 border border-neutral-200 viewfinder-box">
                 <div className="viewfinder-corners-bottom"></div>
-                <div className="viewfinder-center text-orange-600"></div>
+                <div className="viewfinder-center text-neutral-900"></div>
 
                 {/* Viewfinder metadata overlay */}
                 <div className="absolute top-6 left-6 z-20 flex gap-4 text-[9px] font-mono tracking-widest text-white bg-black/45 backdrop-blur-xs px-2.5 py-1">

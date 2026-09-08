@@ -97,7 +97,7 @@ export default function InvoiceModal({ id, isOpen, onClose }: InvoiceModalProps)
     const s = status.toUpperCase();
     if (s === "PENDING") {
       return (
-        <span className="px-3 py-1 border border-yellow-300 bg-yellow-50 text-yellow-750 text-[10px] font-mono font-bold uppercase tracking-widest">
+        <span className="px-3 py-1 border border-neutral-300 bg-neutral-50 text-neutral-700 text-[10px] font-mono font-bold uppercase tracking-widest">
           Menunggu Pembayaran
         </span>
       );
@@ -157,7 +157,7 @@ export default function InvoiceModal({ id, isOpen, onClose }: InvoiceModalProps)
             <button
               onClick={handlePrint}
               disabled={loading || !!error || !data}
-              className="px-4 py-2 bg-neutral-900 border border-neutral-900 text-white font-mono text-[10px] uppercase tracking-widest hover:bg-orange-700 hover:border-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-4 py-2 bg-neutral-900 border border-neutral-900 text-white font-mono text-[10px] uppercase tracking-widest hover:bg-neutral-800 hover:border-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Cetak Invoice
             </button>
@@ -340,7 +340,7 @@ export default function InvoiceModal({ id, isOpen, onClose }: InvoiceModalProps)
                   <span className="text-slate-800">Rp 0</span>
                 </div>
                 
-                <div className="flex justify-between sm:justify-end gap-10 py-3 border-t border-neutral-200 text-sm font-bold text-orange-700 mt-2">
+                <div className="flex justify-between sm:justify-end gap-10 py-3 border-t border-neutral-200 text-sm font-bold text-neutral-950 mt-2">
                   <span>Total Tagihan:</span>
                   <span>{formatIDR(data.totalAmount + (data.lateFee || 0) + (data.damageFee || 0) + (data.lossFee || 0) + (data.extensionFee || 0))}</span>
                 </div>

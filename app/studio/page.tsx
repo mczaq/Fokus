@@ -23,11 +23,11 @@ export default function PublicStudioPage() {
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Reveal direction="up">
-              <span className="text-orange-700 font-mono tracking-widest uppercase text-xs mb-3 block">
+              <span className="text-neutral-500 font-mono tracking-widest uppercase text-xs mb-3 block">
                 SEWA STUDIO
               </span>
               <h1 className="text-4xl md:text-5xl font-light text-slate-900 font-serif leading-tight">
-                Ruang Kreatif <span className="italic font-bold text-orange-700">Premium</span> untuk Sesi Foto Anda
+                Ruang Kreatif <span className="italic font-bold text-black border-b-2 border-black pb-0.5">Premium</span> untuk Sesi Foto Anda
               </h1>
               <p className="text-slate-500 text-sm mt-4 max-w-md mx-auto">
                 Studio foto lengkap ber-AC dengan penataan cahaya alami maupun studio professional lighting yang siap memaksimalkan hasil foto Anda.
@@ -46,7 +46,7 @@ export default function PublicStudioPage() {
                 <Reveal key={studio.id} delay={i * 100} direction="up">
                   <div className="bg-white border border-neutral-200 viewfinder-box p-3 rounded-none flex flex-col lg:flex-row relative">
                     <div className="viewfinder-corners-bottom"></div>
-                    <div className="viewfinder-center text-orange-600"></div>
+                    <div className="viewfinder-center text-neutral-900"></div>
 
                     {/* Left: Image */}
                     <div className="relative w-full lg:w-[50%] h-[300px] sm:h-[400px] lg:h-auto bg-slate-100 min-h-[350px]">
@@ -88,7 +88,7 @@ export default function PublicStudioPage() {
                             <h2 className="text-2xl font-bold text-slate-900 font-serif italic mb-1">
                               {studio.name}
                             </h2>
-                            <div className="flex items-center gap-1.5 text-amber-600 font-mono text-xs font-bold">
+                            <div className="flex items-center gap-1.5 text-slate-800 font-mono text-xs font-bold">
                               <span>⭐ 5.0</span>
                               <span className="text-slate-400 font-normal text-[10px]">(32 Ulasan Pelanggan)</span>
                             </div>
@@ -112,7 +112,7 @@ export default function PublicStudioPage() {
                             <div className="grid grid-cols-2 gap-3.5">
                               {studio.facilities.map((fac, idx) => (
                                 <div key={idx} className="flex items-center text-xs text-slate-600 font-medium">
-                                  <svg className="w-4 h-4 text-orange-600 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className="w-4 h-4 text-neutral-950 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                                   </svg>
                                   <span>{fac}</span>
@@ -127,7 +127,7 @@ export default function PublicStudioPage() {
                       <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                         <div>
                           <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Tarif Sewa</div>
-                          <div className="text-2xl font-extrabold text-orange-700">
+                          <div className="text-2xl font-extrabold text-neutral-950 font-mono">
                             {formatIDR(studio.pricePerHour)}
                             <span className="text-xs font-semibold text-slate-500"> / jam</span>
                           </div>

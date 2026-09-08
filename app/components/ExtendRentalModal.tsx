@@ -62,7 +62,7 @@ export default function ExtendRentalModal({
         {/* Header */}
         <div className="bg-slate-900 text-white p-5 border-b border-slate-800 flex justify-between items-center">
           <div>
-            <span className="text-[9px] font-mono uppercase tracking-widest text-orange-400 font-bold block">
+            <span className="text-[9px] font-mono uppercase tracking-widest text-neutral-400 font-bold block">
               PERPANJANG SEWA (EXTEND RENTAL)
             </span>
             <h2 className="text-sm font-serif italic font-bold text-white">
@@ -98,7 +98,7 @@ export default function ExtendRentalModal({
                   onClick={() => setExtraDays(d)}
                   className={`py-2 border text-xs font-bold transition-all cursor-pointer ${
                     extraDays === d
-                      ? "bg-orange-700 text-white border-orange-700 shadow-xs"
+                      ? "bg-black text-white border-black shadow-xs"
                       : "bg-white border-neutral-300 text-slate-700 hover:bg-neutral-50"
                   }`}
                 >
@@ -110,7 +110,7 @@ export default function ExtendRentalModal({
 
           <div className="pt-3 border-t border-neutral-200 flex justify-between items-center text-xs font-bold">
             <span className="text-slate-500 uppercase">Estimasi Biaya Tambahan:</span>
-            <span className="text-orange-700 font-serif italic text-base">
+            <span className="text-neutral-950 font-serif italic text-base">
               Rp {estimatedCost.toLocaleString("id-ID")}
             </span>
           </div>
@@ -135,7 +135,7 @@ export default function ExtendRentalModal({
             type="button"
             disabled={loading}
             onClick={handleExtend}
-            className="px-5 py-2.5 bg-orange-700 hover:bg-orange-850 text-white font-mono text-xs font-bold uppercase tracking-widest transition-colors shadow-md disabled:opacity-50"
+            className="px-5 py-2.5 bg-black hover:bg-neutral-800 text-white font-mono text-xs font-bold uppercase tracking-widest transition-colors shadow-md disabled:opacity-50"
           >
             {loading ? "Memproses..." : "Konfirmasi Extend & Tagih"}
           </button>

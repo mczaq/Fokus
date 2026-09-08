@@ -212,14 +212,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Logo */}
       <div className="px-6 py-5 border-b border-[#e7e6df] bg-white">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 border border-neutral-950 flex items-center justify-center text-neutral-950 font-bold relative font-serif italic text-sm transition-colors group-hover:border-orange-700 group-hover:text-orange-700">
+          <div className="w-8 h-8 border border-neutral-950 flex items-center justify-center text-neutral-950 font-bold relative font-serif italic text-sm transition-colors group-hover:border-black group-hover:text-black">
             <span className="absolute top-0 left-0 w-1 h-1 border-t border-l border-neutral-950"></span>
             <span className="absolute top-0 right-0 w-1 h-1 border-t border-r border-neutral-950"></span>
             <span className="absolute bottom-0 left-0 w-1 h-1 border-b border-l border-neutral-950"></span>
             <span className="absolute bottom-0 right-0 w-1 h-1 border-b border-r border-neutral-950"></span>
             F
           </div>
-          <span className="font-bold text-base text-slate-900 tracking-widest font-mono uppercase transition-colors group-hover:text-orange-700">Fokus</span>
+          <span className="font-bold text-base text-slate-900 tracking-widest font-mono uppercase transition-colors group-hover:text-black">Fokus</span>
         </Link>
       </div>
 
@@ -238,7 +238,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="text-xs font-bold text-slate-900 truncate font-serif italic">{user.name}</div>
             <span className={`inline-flex items-center px-2 py-0.5 border text-[8px] font-mono font-bold uppercase tracking-widest ${
               user.role === "superuser" ? "border-purple-300 text-purple-700" :
-              user.role === "admin" ? "border-orange-300 text-orange-700" :
+              user.role === "admin" ? "border-neutral-900 bg-neutral-900 text-white" :
               "border-slate-300 text-slate-600"
             }`}>{user.role}</span>
           </div>
@@ -259,7 +259,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onClick={() => setSidebarOpen(false)}
             className={`flex items-center gap-3 px-3 py-2 border font-mono text-[10px] uppercase tracking-widest transition-all ${
               isActive(item.href)
-                ? "bg-orange-700 text-white border-orange-700"
+                ? "bg-black text-white border-black"
                 : "text-slate-700 border-transparent hover:bg-neutral-100 hover:text-slate-950"
             }`}
           >
@@ -280,7 +280,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center justify-between px-3 py-2 border font-mono text-[10px] uppercase tracking-widest transition-all ${
                   isActive(item.href)
-                    ? "bg-orange-700 text-white border-orange-700"
+                    ? "bg-black text-white border-black"
                     : "text-slate-700 border-transparent hover:bg-neutral-100 hover:text-slate-950"
                 }`}
               >
@@ -290,7 +290,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
                 {item.label === "Chat Pelanggan" && unreadChatCount > 0 && (
                   <span className={`font-bold text-[8px] w-4 h-4 flex items-center justify-center shrink-0 ${
-                    isActive(item.href) ? "bg-white text-orange-750" : "bg-orange-750 text-white"
+                    isActive(item.href) ? "bg-white text-black" : "bg-black text-white"
                   }`}>
                     {unreadChatCount}
                   </span>

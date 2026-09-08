@@ -21,15 +21,15 @@ export default function EulaModal({ isOpen, onClose, onAccept }: EulaModalProps)
       <div className="bg-[#FAF9F5] border border-neutral-300 w-full max-w-2xl relative shadow-2xl rounded-none overflow-hidden animate-fade-up z-10 flex flex-col max-h-[85vh]">
         
         {/* Decorative corner borders */}
-        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-orange-700"></div>
-        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-orange-700"></div>
-        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-orange-700"></div>
-        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-orange-700"></div>
+        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neutral-900"></div>
+        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neutral-900"></div>
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neutral-900"></div>
+        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neutral-900"></div>
 
         {/* Header */}
         <div className="bg-slate-900 text-white p-5 border-b border-slate-800 flex items-center justify-between">
           <div>
-            <span className="text-[9px] font-mono uppercase tracking-widest text-orange-400 font-bold block">
+            <span className="text-[9px] font-mono uppercase tracking-widest text-neutral-400 font-bold block">
               SYARAT &amp; KONTRAK RENTAL FOKUS STUDIO
             </span>
             <h2 className="text-base font-serif italic font-bold text-white">
@@ -46,7 +46,7 @@ export default function EulaModal({ isOpen, onClose, onAccept }: EulaModalProps)
 
         {/* Scrollable Terms & Conditions Body */}
         <div className="p-6 overflow-y-auto font-mono text-xs text-slate-700 space-y-4 leading-relaxed bg-white flex-1 border-b border-neutral-200">
-          <div className="p-3 bg-orange-50 border border-orange-200 text-orange-950 rounded text-[11px] font-bold">
+          <div className="p-3 bg-neutral-100 border border-neutral-300 text-neutral-950 rounded text-[11px] font-bold">
             ⚠️ PERHATIAN: Harap membaca seluruh pasal Kontrak Sewa di bawah ini sebelum menyetujui dan melanjutkan proses pembayaran.
           </div>
 
@@ -113,7 +113,7 @@ export default function EulaModal({ isOpen, onClose, onAccept }: EulaModalProps)
                 onAccept();
                 onClose();
               }}
-              className="px-5 py-2.5 bg-orange-700 hover:bg-orange-850 text-white font-mono text-xs font-bold uppercase tracking-widest transition-colors shadow-md"
+              className="px-5 py-2.5 bg-black hover:bg-neutral-800 text-white font-mono text-xs font-bold uppercase tracking-widest transition-colors shadow-md"
             >
               ✓ Saya Memahami &amp; Menyetujui Kontrak
             </button>

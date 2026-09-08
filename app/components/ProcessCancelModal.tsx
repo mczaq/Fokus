@@ -245,9 +245,9 @@ export default function ProcessCancelModal({
               )}
             </div>
           ) : (
-            <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1">
+            <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-300 text-xs text-neutral-800 space-y-1">
               <span className="font-bold flex items-center gap-1">ℹ️ Pembatalan Langsung oleh Admin</span>
-              <p className="text-[11px] text-amber-700 leading-relaxed">
+              <p className="text-[11px] text-neutral-600 leading-relaxed">
                 Penyewa belum mengisi form pengajuan website (misal: permintaan melalui kasir/WhatsApp). Anda dapat memasukkan detail rekening dan nominal pengembalian dana untuk mencatat refund di pembukuan keuangan.
               </p>
             </div>

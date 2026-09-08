@@ -92,7 +92,7 @@ export default function ChatWindow() {
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-orange-700 hover:bg-orange-800 text-white px-5 py-3 shadow-xl transition-all border border-orange-750 flex items-center gap-2 cursor-pointer select-none rounded-none"
+          className="bg-black hover:bg-neutral-800 text-white px-5 py-3 shadow-xl transition-all border border-black flex items-center gap-2 cursor-pointer select-none rounded-none"
         >
           <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -139,14 +139,14 @@ export default function ChatWindow() {
                     <div
                       className={`max-w-[75%] px-3.5 py-2.5 border ${
                         isMe
-                          ? "bg-orange-700 border-orange-750 text-white"
+                          ? "bg-black border-black text-white"
                           : "bg-white border-neutral-200 text-slate-800"
                       }`}
                     >
                       <p className="leading-relaxed break-words text-[11px] whitespace-pre-line">{msg.content}</p>
                       <span
                         className={`block text-[8px] mt-1 text-right ${
-                          isMe ? "text-orange-200" : "text-slate-400"
+                          isMe ? "text-neutral-300" : "text-slate-400"
                         }`}
                       >
                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -167,11 +167,11 @@ export default function ChatWindow() {
               value={inputMsg}
               onChange={(e) => setInputMsg(e.target.value)}
               placeholder="Tulis pesan..."
-              className="flex-1 px-3 py-2 border border-neutral-250 bg-white text-xs font-mono focus:outline-hidden focus:border-orange-700"
+              className="flex-1 px-3 py-2 border border-neutral-250 bg-white text-xs font-mono focus:outline-hidden focus:border-black"
             />
             <button
               type="submit"
-              className="bg-neutral-950 hover:bg-neutral-900 text-white font-mono text-[9px] uppercase tracking-widest px-4 py-2 hover:bg-orange-700 transition-colors cursor-pointer"
+              className="bg-neutral-950 hover:bg-neutral-800 text-white font-mono text-[9px] uppercase tracking-widest px-4 py-2 transition-colors cursor-pointer"
             >
               Kirim
             </button>
