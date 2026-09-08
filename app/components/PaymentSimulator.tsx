@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 
+import EulaModal from "./EulaModal";
+
 interface PaymentSimulatorProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,10 +18,19 @@ export default function PaymentSimulator({
   totalAmount,
   onSuccess,
 }: PaymentSimulatorProps) {
-  const [method, setMethod] = useState<"BCA" | "MANDIRI" | "QRIS" | null>(null);
+  const [method, setMethod] = useState<"BCA" | "MANDIRI" | "QRIS" | "TUNAI" | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [midtransToken, setMidtransToken] = useState<string | null>(null);
+  const [midtransLoading, setMidtransLoading] = useState(false);
+  const [proofImage, setProofImage] = useState<string | null>(null);
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // EULA & Agreement state
+  const [agreementChecked, setAgreementChecked] = useState(false);
+  const [isEulaOpen, setIsEulaOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -27,14 +38,46 @@ export default function PaymentSimulator({
       setSuccess(false);
       setLoading(false);
       setCopied(false);
+      setMidtransToken(null);
+      setProofImage(null);
+      setUploadingProof(false);
+      setUploadError(null);
+      setAgreementChecked(false);
+      setIsEulaOpen(false);
       document.body.style.overflow = "hidden";
+
+      // Fetch Midtrans token
+      setMidtransLoading(true);
+      fetch("/api/payments/midtrans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.token) {
+            setMidtransToken(data.token);
+            // Load midtrans script dynamically
+            const snapScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+            const existingScript = document.getElementById("midtrans-snap-script");
+            if (!existingScript) {
+              const script = document.createElement("script");
+              script.src = snapScriptUrl;
+              script.id = "midtrans-snap-script";
+              script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "");
+              document.body.appendChild(script);
+            }
+          }
+        })
+        .catch((err) => console.error("Error fetching Midtrans token:", err))
+        .finally(() => setMidtransLoading(false));
     } else {
       document.body.style.overflow = "unset";
     }
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen]);
+  }, [isOpen, orderId]);
 
   if (!isOpen) return null;
 
@@ -44,7 +87,8 @@ export default function PaymentSimulator({
   const getVaNumber = (bank: string) => {
     const code = bank === "BCA" ? "80777" : "88321";
     // Strip prefix like ORD- or STB-
-    const suffix = orderId.replace("ORD-", "").replace("STB-", "").slice(0, 7).toUpperCase();
+    const safeId = orderId ? String(orderId) : "00000";
+    const suffix = safeId.replace("ORD-", "").replace("STB-", "").slice(0, 7).toUpperCase();
     // Map letters to numbers
     const numSuffix = suffix.split("").map(char => {
       const code = char.charCodeAt(0);
@@ -59,13 +103,81 @@ export default function PaymentSimulator({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Generate a clean simulated receipt data URL for instant sandbox demo
+  const handleUseDemoReceipt = () => {
+    if (!agreementChecked) {
+      setUploadError("⚠️ WAJIB menyetujui Kontrak Rental & User Agreement (EULA) terlebih dahulu!");
+      return;
+    }
+    const receiptSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">
+      <rect width="100%" height="100%" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="0" y="0" width="400" height="42" fill="#c2410c"/>
+      <text x="200" y="27" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">BUKTI RESI TRANSFER SIMULASI</text>
+      <text x="25" y="75" font-family="monospace" font-size="11" fill="#475569">ID TRANSAKSI : ${orderId || "ORD-DEMO"}</text>
+      <text x="25" y="105" font-family="monospace" font-size="11" fill="#475569">METODE       : ${method || "SIMULASI"}</text>
+      <text x="25" y="135" font-family="monospace" font-size="12" font-weight="bold" fill="#0f172a">TOTAL TAGIHAN: ${formatIDR(totalAmount)}</text>
+      <text x="25" y="165" font-family="monospace" font-size="11" font-weight="bold" fill="#16a34a">STATUS       : DIVERIFIKASI (LUNAS)</text>
+      <text x="25" y="195" font-family="monospace" font-size="10" fill="#94a3b8">WAKTU        : ${new Date().toLocaleString("id-ID")}</text>
+      <line x1="20" y1="220" x2="380" y2="220" stroke="#cbd5e1" stroke-dasharray="4"/>
+      <text x="200" y="242" font-family="sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">FOKUS STUDIO &amp; RENTAL - DEMO SANDBOX</text>
+    </svg>`;
+    const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(receiptSvg)}`;
+    setProofImage(dataUrl);
+    setUploadError(null);
+  };
+
+  const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!agreementChecked) {
+      setUploadError("⚠️ WAJIB menyetujui Kontrak Rental & User Agreement (EULA) terlebih dahulu!");
+      return;
+    }
+
+    setUploadingProof(true);
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setProofImage(data.url);
+      } else {
+        setUploadError(data.error || "Gagal mengunggah gambar bukti transfer.");
+      }
+    } catch (err) {
+      console.error("Proof upload error:", err);
+      setUploadError("Terjadi kesalahan koneksi saat mengunggah foto.");
+    } finally {
+      setUploadingProof(false);
+    }
+  };
+
   const handleSimulatePayment = async () => {
+    if (!agreementChecked) {
+      setUploadError("⚠️ WAJIB membaca dan menyetujui Kontrak Rental & User Agreement terlebih dahulu!");
+      return;
+    }
+
+    if (!proofImage && method !== "TUNAI") {
+      setUploadError("⚠️ WAJIB mengunggah foto bukti transfer atau gunakan tombol '⚡ Gunakan Struk Simulasi'!");
+      return;
+    }
+
     setLoading(true);
+    setUploadError(null);
     try {
       const payload = {
         id: orderId,
-        paymentMethod: method === "QRIS" ? "QRIS" : `VA_${method}`,
+        paymentMethod: method === "TUNAI" ? "CASH_STUDIO" : method === "QRIS" ? "QRIS" : `VA_${method}`,
         amount: totalAmount,
+        proofImage: proofImage || null,
+        agreementAccepted: true,
       };
 
       const res = await fetch("/api/payments/webhook", {
@@ -74,20 +186,70 @@ export default function PaymentSimulator({
         body: JSON.stringify(payload),
       });
 
-      if (res.ok) {
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.success) {
         setSuccess(true);
         setTimeout(() => {
           onSuccess();
           onClose();
         }, 2000);
       } else {
-        alert("Gagal memproses simulasi pembayaran.");
+        const errorMsg = data?.error || "Gagal memproses pembayaran. Periksa kembali status tagihan Anda.";
+        setUploadError(`❌ ${errorMsg}`);
+        alert(errorMsg);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Terjadi kesalahan koneksi simulator.");
+      const networkMsg = err?.message || "Terjadi kesalahan koneksi simulator.";
+      setUploadError(`❌ ${networkMsg}`);
+      alert(networkMsg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const payWithMidtrans = () => {
+    if (typeof window !== "undefined" && (window as any).snap) {
+      (window as any).snap.pay(midtransToken, {
+        onSuccess: async function (result: any) {
+          console.log("Midtrans payment success:", result);
+          try {
+            await fetch("/api/payments/webhook", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: orderId,
+                paymentMethod: "MIDTRANS_" + (result?.payment_type?.toUpperCase() || "ONLINE"),
+                amount: totalAmount,
+                proofImage: result?.transaction_id ? `midtrans://${result.transaction_id}` : null,
+                agreementAccepted: true,
+              }),
+            });
+          } catch (e) {
+            console.error("Failed to notify backend of Midtrans payment:", e);
+          }
+          setSuccess(true);
+          setTimeout(() => {
+            onSuccess();
+            onClose();
+          }, 2000);
+        },
+        onPending: function (result: any) {
+          console.log("Midtrans payment pending:", result);
+          alert("Pembayaran tertunda. Silakan selesaikan pembayaran Anda sesuai petunjuk Midtrans.");
+          onClose();
+        },
+        onError: function (result: any) {
+          console.error("Midtrans payment error:", result);
+          alert("Pembayaran gagal. Silakan coba kembali.");
+        },
+        onClose: function () {
+          console.log("User closed payment popup.");
+        }
+      });
+    } else {
+      alert("Memuat sistem pembayaran Midtrans... Silakan coba lagi dalam beberapa detik.");
     }
   };
 
@@ -158,7 +320,24 @@ export default function PaymentSimulator({
               <div>
                 <h3 className="text-xs font-bold text-slate-900 font-mono uppercase tracking-widest mb-4">Pilih Cara Pembayaran</h3>
                 <div className="space-y-3">
-                  
+                  {midtransLoading && (
+                    <div className="text-center py-2 text-[10px] font-mono text-slate-400">
+                      Memeriksa ketersediaan pembayaran online...
+                    </div>
+                  )}
+                  {midtransToken && (
+                    <button
+                      onClick={payWithMidtrans}
+                      className="w-full flex items-center justify-between p-3.5 bg-orange-700 hover:bg-orange-850 text-white transition-colors text-left group cursor-pointer shadow-md"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-6 bg-white flex items-center justify-center text-[8px] font-extrabold text-orange-700 border font-mono">MIDTRANS</div>
+                        <span className="text-xs font-bold text-white">Bayar Online Aman (GoPay, ShopeePay, CC, dll)</span>
+                      </div>
+                      <span className="text-white group-hover:translate-x-1 transition-transform text-xs">&rarr;</span>
+                    </button>
+                  )}
+
                   {/* BCA */}
                   <button 
                     onClick={() => setMethod("BCA")}
@@ -195,6 +374,18 @@ export default function PaymentSimulator({
                     <span className="text-slate-350 group-hover:text-slate-800 text-xs transition-colors">&rarr;</span>
                   </button>
 
+                  {/* Tunai (Cash) */}
+                  <button 
+                    onClick={() => setMethod("TUNAI")}
+                    className="w-full flex items-center justify-between p-3.5 bg-emerald-50/60 border border-emerald-200 hover:border-emerald-700 transition-colors text-left group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-6 bg-emerald-700 text-white flex items-center justify-center text-[10px] font-extrabold border font-mono">CASH</div>
+                      <span className="text-xs font-bold text-emerald-950">💵 Bayar Tunai di Studio (Cash)</span>
+                    </div>
+                    <span className="text-emerald-600 group-hover:translate-x-1 transition-transform text-xs">&rarr;</span>
+                  </button>
+
                 </div>
               </div>
 
@@ -214,10 +405,27 @@ export default function PaymentSimulator({
                     &larr; Kembali
                   </button>
                   <span className="text-slate-300">|</span>
-                  <span className="text-[10px] font-bold text-slate-800 font-mono uppercase tracking-wider">{method === "QRIS" ? "Pembayaran QRIS" : `${method} Virtual Account`}</span>
+                  <span className="text-[10px] font-bold text-slate-800 font-mono uppercase tracking-wider">
+                    {method === "TUNAI" ? "💵 Bayar Tunai (Cash di Studio)" : method === "QRIS" ? "Pembayaran QRIS" : `${method} Virtual Account`}
+                  </span>
                 </div>
 
-                {method === "QRIS" ? (
+                {method === "TUNAI" ? (
+                  /* Tunai / Cash Mode */
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-900 space-y-3 rounded-lg">
+                    <div className="font-bold flex items-center gap-1.5 text-sm text-emerald-900">
+                      <span>💵</span>
+                      <span>Pembayaran Tunai di Studio / Cash</span>
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-emerald-800">
+                      Silakan lakukan pembayaran secara <strong>TUNAI (Cash)</strong> di kasir studio saat penyerahan alat atau sesi foto berlangsung.
+                    </p>
+                    <div className="pt-2.5 border-t border-emerald-200 text-xs font-bold text-slate-900 flex justify-between items-center">
+                      <span>Total Tagihan Tunai:</span>
+                      <span className="text-sm text-emerald-700 font-extrabold">{formatIDR(totalAmount)}</span>
+                    </div>
+                  </div>
+                ) : method === "QRIS" ? (
                   /* QRIS Mode */
                   <div className="flex flex-col items-center py-2">
                     <div className="p-3 bg-white border border-neutral-300 shadow-md flex flex-col items-center gap-2 relative">
@@ -240,11 +448,11 @@ export default function PaymentSimulator({
                       <input 
                         type="text" 
                         readOnly 
-                        value={getVaNumber(method)} 
+                        value={getVaNumber(method || "BCA")} 
                         className="flex-1 input-modern py-1.5 px-3 font-mono font-bold text-xs bg-slate-100 text-slate-800"
                       />
                       <button 
-                        onClick={() => handleCopy(getVaNumber(method))}
+                        onClick={() => handleCopy(getVaNumber(method || "BCA"))}
                         className="px-4 py-1.5 border border-neutral-250 hover:bg-neutral-100 text-xs font-mono uppercase tracking-widest transition-colors cursor-pointer"
                       >
                         {copied ? "Copied" : "Copy"}
@@ -260,19 +468,172 @@ export default function PaymentSimulator({
                     </div>
                   </div>
                 )}
+
+                {/* User Agreement / EULA Checklist Section */}
+                <div className="mt-4 p-3 bg-orange-50/70 border border-orange-200 rounded-lg space-y-2">
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="agreement-checkbox"
+                      checked={agreementChecked}
+                      onChange={(e) => {
+                        setAgreementChecked(e.target.checked);
+                        if (e.target.checked) setUploadError(null);
+                      }}
+                      className="mt-0.5 w-4 h-4 text-orange-700 accent-orange-700 rounded border-neutral-300 cursor-pointer"
+                    />
+                    <label htmlFor="agreement-checkbox" className="text-[11px] font-mono text-slate-800 leading-snug cursor-pointer select-none">
+                      Saya telah membaca dan menyetujui{" "}
+                      <button
+                        type="button"
+                        onClick={() => setIsEulaOpen(true)}
+                        className="text-orange-700 font-bold underline hover:text-orange-950 inline-block cursor-pointer"
+                      >
+                        EULA, Syarat &amp; Kontrak Rental
+                      </button>
+                      , Kode Etik, dan Kebijakan Privasi Fokus Studio.
+                    </label>
+                  </div>
+                  {!agreementChecked && (
+                    <p className="text-[9px] text-rose-600 font-mono font-bold pl-6">
+                      * Kotak ini wajib di-centang sebelum mengunggah bukti pembayaran.
+                    </p>
+                  )}
+                </div>
+
+                {/* Proof Upload Form Section / Studio Cash Notice */}
+                {method === "TUNAI" ? (
+                  <div className="mt-4 pt-3 border-t border-neutral-200">
+                    <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-lg text-xs font-mono space-y-2">
+                      <div className="flex items-center gap-2 font-bold text-emerald-900 text-xs">
+                        <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">✓</span>
+                        <span>Pembayaran Tunai Langsung di Kasir Studio</span>
+                      </div>
+                      <p className="text-[11px] text-emerald-800 leading-relaxed">
+                        Anda <strong>tidak perlu mengunggah bukti transfer</strong>. Cukup centang persetujuan Kontrak Rental (EULA) di atas, lalu tekan tombol konfirmasi di bawah untuk memproses pesanan Anda.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-4 pt-3 border-t border-neutral-200">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[9px] font-mono uppercase tracking-widest text-slate-700 font-extrabold flex items-center gap-1">
+                        📷 Unggah Bukti Transfer / Resi Struk
+                      </span>
+                      <span className="text-[9px] font-mono font-extrabold uppercase px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200">
+                        WAJIB *
+                      </span>
+                    </div>
+
+                    {proofImage ? (
+                      <div className="bg-white p-2.5 rounded-lg border border-emerald-300 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={proofImage}
+                            alt="Bukti Transfer"
+                            className="w-12 h-12 object-cover rounded border border-slate-200 shrink-0"
+                          />
+                          <div>
+                            <span className="text-[10px] font-bold text-emerald-700 block">✓ Bukti Transfer Terpasang</span>
+                            <span className="text-[9px] text-slate-400 font-mono">Siap diverifikasi &amp; dikonfirmasi</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setProofImage(null)}
+                          className="text-[10px] text-rose-600 hover:underline font-mono font-bold cursor-pointer"
+                        >
+                          Ganti Foto
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleProofUpload}
+                            disabled={uploadingProof || !agreementChecked}
+                            className="hidden"
+                            id="proof-image-upload"
+                          />
+                          <label
+                            htmlFor="proof-image-upload"
+                            className={`w-full flex items-center justify-center gap-2 p-3 bg-white border-2 border-dashed rounded-lg text-xs font-medium cursor-pointer transition-colors ${
+                              !agreementChecked
+                                ? "border-neutral-200 bg-neutral-100/70 text-neutral-400 cursor-not-allowed opacity-60"
+                                : uploadError
+                                ? "border-rose-400 bg-rose-50/50 text-rose-700"
+                                : "border-neutral-300 hover:border-orange-500 text-slate-600"
+                            }`}
+                          >
+                            {uploadingProof ? (
+                              <span className="text-orange-600 font-mono text-[10px] flex items-center gap-1.5 font-bold">
+                                <span className="animate-spin inline-block w-3.5 h-3.5 border-2 border-orange-600 border-t-transparent rounded-full" />
+                                Mengunggah foto resi...
+                              </span>
+                            ) : (
+                              <>
+                                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                                  <circle cx="8.5" cy="8.5" r="1.5" />
+                                  <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                                <span className="font-mono text-[10px] font-bold">
+                                  {!agreementChecked
+                                    ? "CENTANG EULA & KONTRAK RENTAL UNTUK BUKA UNGGAH"
+                                    : "KLIK DI SINI UNTUK UNGGAH FOTO RESI BUKTI TRANSFER"}
+                                </span>
+                              </>
+                            )}
+                          </label>
+                        </div>
+
+                        {/* Instant Demo/Sandbox Auto-Receipt Button */}
+                        <button
+                          type="button"
+                          disabled={!agreementChecked}
+                          onClick={handleUseDemoReceipt}
+                          className="w-full py-2 px-3 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-[10px] font-mono font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span>⚡</span>
+                          <span>Gunakan Resi Simulasi Otomatis (Demo/Sandbox Instan)</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {uploadError && (
+                      <p className="text-[10px] text-rose-600 font-mono font-bold mt-1.5 bg-rose-50 p-2 border border-rose-200 rounded">
+                        {uploadError}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Simulation Sandbox Block */}
-              <div className="mt-6 pt-4 border-t border-neutral-200">
-                <div className="mb-3 p-2 bg-orange-50 border border-orange-200 text-[9px] font-mono text-orange-800 tracking-wide">
-                  ⚠️ <strong>SANDBOX SIMULATOR:</strong> Klik tombol hijau di bawah untuk menirukan notifikasi sukses dari perbankan/QRIS secara instan.
-                </div>
+              <div className="mt-4 pt-3 border-t border-neutral-200">
                 <button
+                  disabled={loading || !agreementChecked}
                   onClick={handleSimulatePayment}
-                  className="w-full btn-primary bg-green-700 hover:bg-green-800 text-white font-mono text-[10px] uppercase tracking-widest py-3 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-green-700/10"
+                  className={`w-full font-mono text-[10px] uppercase tracking-widest py-3 flex items-center justify-center gap-2 cursor-pointer shadow-lg transition-all rounded-lg ${
+                    !agreementChecked
+                      ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                      : method === "TUNAI" || proofImage
+                      ? "bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                      : "bg-orange-700 hover:bg-orange-850 text-white font-bold"
+                  }`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  Bayar Sekarang (Simulasi)
+                  {loading
+                    ? "Memproses Pembayaran..."
+                    : !agreementChecked
+                    ? "🔒 Centang User Agreement Sebelum Konfirmasi"
+                    : method === "TUNAI"
+                    ? "💵 Konfirmasi Pembayaran Tunai di Studio"
+                    : proofImage
+                    ? "✓ Kirim Bukti Transfer & Konfirmasi Pembayaran"
+                    : "⚠️ Unggah Bukti Transfer / Gunakan Resi Simulasi"}
                 </button>
               </div>
 
@@ -281,6 +642,16 @@ export default function PaymentSimulator({
 
         </div>
       </div>
+
+      {/* EULA Modal */}
+      <EulaModal
+        isOpen={isEulaOpen}
+        onClose={() => setIsEulaOpen(false)}
+        onAccept={() => {
+          setAgreementChecked(true);
+          setUploadError(null);
+        }}
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -8,6 +10,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const data = await request.json();
+    console.log("PUT /api/equipment/[id] request data:", data);
 
     const existing = await prisma.equipment.findUnique({
       where: { id },
@@ -25,9 +28,10 @@ export async function PUT(
         brand: data.brand !== undefined ? data.brand : existing.brand,
         type: data.category !== undefined ? data.category : existing.type,
         specs: data.specs !== undefined ? data.specs : existing.specs,
-        pricePerDay: data.pricePerDay !== undefined ? data.pricePerDay : existing.pricePerDay,
-        stock: data.stock !== undefined ? data.stock : existing.stock,
-        available: data.available !== undefined ? data.available : existing.available,
+        pricePerDay: data.pricePerDay !== undefined ? Number(data.pricePerDay) : existing.pricePerDay,
+        originalPrice: data.originalPrice !== undefined ? Number(data.originalPrice) : existing.originalPrice,
+        stock: data.stock !== undefined ? Number(data.stock) : existing.stock,
+        available: data.available !== undefined ? Number(data.available) : existing.available,
         image: data.image !== undefined ? data.image : existing.image,
         isActive: data.isActive !== undefined ? data.isActive : existing.isActive,
       },
@@ -41,6 +45,7 @@ export async function PUT(
       description: updated.description || "",
       specs: updated.specs || "",
       pricePerDay: updated.pricePerDay,
+      originalPrice: updated.originalPrice,
       stock: updated.stock,
       available: updated.available,
       tag: "",
@@ -50,9 +55,9 @@ export async function PUT(
     };
 
     return NextResponse.json(mapped);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating equipment:", error);
-    return NextResponse.json({ error: "Failed to update equipment" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update equipment", details: error.message || String(error) }, { status: 500 });
   }
 }
 

@@ -41,12 +41,15 @@ export default function ChatWindow() {
     fetch(`/api/chat?userId=${user.id}`)
       .then((res) => {
         if (res.ok) return res.json();
-        throw new Error("Failed to load chat history");
+        // Silently ignore non-200 responses (e.g. 400, 500) during polling
+        return [];
       })
       .then((data) => {
-        setMessages(data || []);
+        if (Array.isArray(data)) setMessages(data);
       })
-      .catch((err) => console.error(err))
+      .catch(() => {
+        // Silently ignore network errors during polling
+      })
       .finally(() => {
         if (!silent) setLoading(false);
       });
