@@ -59,6 +59,16 @@ interface RentalRecord {
   damageFee?: number;
   lossFee?: number;
   feeStatus?: string;
+  unpaidLateFee?: number;
+  unpaidExtensionFee?: number;
+  unpaidDamageFee?: number;
+  unpaidLossFee?: number;
+  unpaidTotalFee?: number;
+  paidLateFee?: number;
+  paidExtensionFee?: number;
+  paidDamageFee?: number;
+  paidLossFee?: number;
+  totalFee?: number;
   damageNotes?: string | null;
   conditionStatus?: string;
   agreementAccepted?: boolean;
@@ -621,10 +631,52 @@ export default function RentalMonitoringPage() {
                           <p className="text-slate-400 text-[10px] font-mono block">
                             Total: {formatIDR(record.totalAmount)}
                           </p>
-                          {record.conditionStatus && record.conditionStatus !== "NORMAL" && (
-                            <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-neutral-200 text-neutral-900 border border-neutral-400 rounded">
-                              ⚠️ {record.conditionStatus}
-                            </span>
+                          {Boolean(record.conditionStatus === "DAMAGED" || (record.damageFee && record.damageFee > 0)) && (
+                            <div className="space-y-1 mt-1.5 pt-1.5 border-t border-neutral-100">
+                              <div className="flex flex-wrap items-center gap-1">
+                                <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-neutral-200 text-neutral-900 border border-neutral-400 rounded">
+                                  🔴 Kerusakan
+                                </span>
+                                {((record.paidDamageFee !== undefined && record.damageFee ? record.paidDamageFee >= record.damageFee : false) || record.feeStatus === "PAID") ? (
+                                  <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 rounded">
+                                    ✓ (denda sudah lunas)
+                                  </span>
+                                ) : (
+                                  <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded animate-pulse">
+                                    ⚠️ (denda belum lunas)
+                                  </span>
+                                )}
+                              </div>
+                              {Boolean(record.damageFee && record.damageFee > 0) && (
+                                <p className="text-[10px] font-mono text-slate-600">
+                                  Denda: {formatIDR(record.damageFee!)}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {Boolean(record.conditionStatus === "LOST" || (record.lossFee && record.lossFee > 0)) && (
+                            <div className="space-y-1 mt-1.5 pt-1.5 border-t border-neutral-100">
+                              <div className="flex flex-wrap items-center gap-1">
+                                <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-rose-100 text-rose-900 border border-rose-300 rounded">
+                                  ❌ Hilang
+                                </span>
+                                {((record.paidLossFee !== undefined && record.lossFee ? record.paidLossFee >= record.lossFee : false) || record.feeStatus === "PAID") ? (
+                                  <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 rounded">
+                                    ✓ (denda sudah lunas)
+                                  </span>
+                                ) : (
+                                  <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded animate-pulse">
+                                    ⚠️ (denda belum lunas)
+                                  </span>
+                                )}
+                              </div>
+                              {Boolean(record.lossFee && record.lossFee > 0) && (
+                                <p className="text-[10px] font-mono text-slate-600">
+                                  Ganti Rugi: {formatIDR(record.lossFee!)}
+                                </p>
+                              )}
+                            </div>
                           )}
                         </div>
                       </td>
@@ -913,6 +965,52 @@ export default function RentalMonitoringPage() {
                   ))}
                 </div>
               </div>
+
+              {Boolean(selectedRental.conditionStatus === "DAMAGED" || (selectedRental.damageFee && selectedRental.damageFee > 0)) && (
+                <div className="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-rose-900 text-xs">🔴 Denda Kerusakan Barang</span>
+                    {((selectedRental.paidDamageFee !== undefined && selectedRental.damageFee ? selectedRental.paidDamageFee >= selectedRental.damageFee : false) || selectedRental.feeStatus === "PAID") ? (
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+                        (denda sudah lunas)
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded border border-rose-300">
+                        (denda belum lunas)
+                      </span>
+                    )}
+                  </div>
+                  {Boolean(selectedRental.damageFee && selectedRental.damageFee > 0) && (
+                    <p className="font-mono text-slate-700 text-xs">Denda: {formatIDR(selectedRental.damageFee!)}</p>
+                  )}
+                  {selectedRental.damageNotes && (
+                    <p className="text-[11px] text-slate-600 italic">"{selectedRental.damageNotes}"</p>
+                  )}
+                </div>
+              )}
+
+              {Boolean(selectedRental.conditionStatus === "LOST" || (selectedRental.lossFee && selectedRental.lossFee > 0)) && (
+                <div className="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-rose-900 text-xs">❌ Denda Barang Hilang</span>
+                    {((selectedRental.paidLossFee !== undefined && selectedRental.lossFee ? selectedRental.paidLossFee >= selectedRental.lossFee : false) || selectedRental.feeStatus === "PAID") ? (
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+                        (denda sudah lunas)
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded border border-rose-300">
+                        (denda belum lunas)
+                      </span>
+                    )}
+                  </div>
+                  {Boolean(selectedRental.lossFee && selectedRental.lossFee > 0) && (
+                    <p className="font-mono text-slate-700 text-xs">Ganti Rugi: {formatIDR(selectedRental.lossFee!)}</p>
+                  )}
+                  {selectedRental.damageNotes && (
+                    <p className="text-[11px] text-slate-600 italic">"{selectedRental.damageNotes}"</p>
+                  )}
+                </div>
+              )}
 
               <div className="flex justify-between items-center pt-2 border-t border-slate-100 font-bold text-slate-900 text-sm">
                 <span>Total Biaya</span>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { sendOrderNotificationEmail } from "@/app/lib/email";
 import { syncEquipmentStock } from "@/app/lib/equipmentStock";
+import { calculateOrderFees } from "@/app/lib/feeHelper";
 
 export async function GET(request: Request) {
   try {
@@ -14,10 +15,11 @@ export async function GET(request: Request) {
         user: { select: { name: true } },
         items: {
           include: {
-            equipment: { select: { name: true } },
+            equipment: { select: { name: true, pricePerDay: true } },
             service: { select: { name: true } },
           }
         },
+        payments: true,
       },
     };
 
@@ -36,6 +38,8 @@ export async function GET(request: Request) {
       } catch {
         parsedNotes = null;
       }
+
+      const feeBreakdown = calculateOrderFees(o);
 
       return {
         id: o.orderNumber,
@@ -64,6 +68,16 @@ export async function GET(request: Request) {
         damageFee: o.damageFee,
         lossFee: o.lossFee,
         feeStatus: o.feeStatus,
+        unpaidLateFee: feeBreakdown.unpaidLateFee,
+        unpaidExtensionFee: feeBreakdown.unpaidExtensionFee,
+        unpaidDamageFee: feeBreakdown.unpaidDamageFee,
+        unpaidLossFee: feeBreakdown.unpaidLossFee,
+        unpaidTotalFee: feeBreakdown.unpaidTotalFee,
+        paidLateFee: feeBreakdown.paidLateFee,
+        paidExtensionFee: feeBreakdown.paidExtensionFee,
+        paidDamageFee: feeBreakdown.paidDamageFee,
+        paidLossFee: feeBreakdown.paidLossFee,
+        totalFee: feeBreakdown.totalFee,
         actualPickup: o.actualPickup,
         actualReturn: o.actualReturn,
         userId: o.userId,

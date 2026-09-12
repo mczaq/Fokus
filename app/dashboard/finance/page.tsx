@@ -462,19 +462,44 @@ export default function FinancePage() {
                         </p>
                       </td>
                       <td className="px-6 py-4 align-top font-mono text-[11px] space-y-0.5 text-slate-700">
-                        {p.lateFee > 0 && <div>• Denda Overdue: {formatIDR(p.lateFee)}</div>}
-                        {p.extensionFee > 0 && <div>• Biaya Extend: {formatIDR(p.extensionFee)}</div>}
-                        {p.damageFee > 0 && <div>• Biaya Perbaikan: {formatIDR(p.damageFee)}</div>}
-                        {p.lossFee > 0 && <div>• Ganti Rugi Hilang: {formatIDR(p.lossFee)}</div>}
+                        {p.lateFee > 0 && (
+                          <div>
+                            • Denda Overdue: {formatIDR(p.lateFee)}{" "}
+                            {p.paidLateFee >= p.lateFee ? <span className="text-emerald-700 font-bold">(Lunas)</span> : <span className="text-rose-600">(Belum)</span>}
+                          </div>
+                        )}
+                        {p.extensionFee > 0 && (
+                          <div>
+                            • Biaya Extend: {formatIDR(p.extensionFee)}{" "}
+                            {p.paidExtensionFee >= p.extensionFee ? <span className="text-emerald-700 font-bold">(Lunas)</span> : <span className="text-rose-600">(Belum)</span>}
+                          </div>
+                        )}
+                        {p.damageFee > 0 && (
+                          <div>
+                            • Biaya Perbaikan: {formatIDR(p.damageFee)}{" "}
+                            {p.paidDamageFee >= p.damageFee ? <span className="text-emerald-700 font-bold">(Lunas)</span> : <span className="text-rose-600">(Belum)</span>}
+                          </div>
+                        )}
+                        {p.lossFee > 0 && (
+                          <div>
+                            • Ganti Rugi Hilang: {formatIDR(p.lossFee)}{" "}
+                            {p.paidLossFee >= p.lossFee ? <span className="text-emerald-700 font-bold">(Lunas)</span> : <span className="text-rose-600">(Belum)</span>}
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4 align-top text-right space-y-1">
                         <div className="text-sm font-extrabold font-mono text-rose-700">
                           + {formatIDR(p.totalFee)}
                         </div>
+                        {p.unpaidTotalFee !== undefined && p.unpaidTotalFee > 0 && p.unpaidTotalFee < p.totalFee && (
+                          <div className="text-[10px] font-mono text-rose-600">
+                            Sisa: {formatIDR(p.unpaidTotalFee)}
+                          </div>
+                        )}
                         <span className={`inline-block px-2 py-0.5 text-[9px] font-mono font-bold rounded ${
-                          p.feeStatus === "PAID" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800 animate-pulse"
+                          p.feeStatus === "PAID" || p.unpaidTotalFee === 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800 animate-pulse"
                         }`}>
-                          {p.feeStatus === "PAID" ? "✓ LUNAS" : "⚠️ BELUM DIBAYAR"}
+                          {p.feeStatus === "PAID" || p.unpaidTotalFee === 0 ? "✓ LUNAS" : "⚠️ BELUM DIBAYAR"}
                         </span>
                       </td>
                     </tr>

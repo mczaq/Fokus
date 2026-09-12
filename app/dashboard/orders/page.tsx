@@ -203,7 +203,7 @@ export default function OrdersPage() {
                             </span>
                             {o.feeStatus === "UNPAID" && (
                               <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-rose-300 bg-rose-50 text-rose-700 animate-pulse">
-                                ⚠️ Denda Belum Lunas: Rp {(o.lateFee + o.damageFee + o.lossFee + o.extensionFee).toLocaleString("id-ID")}
+                                ⚠️ Denda Belum Lunas: Rp {(o.unpaidTotalFee !== undefined ? o.unpaidTotalFee : (o.lateFee + o.damageFee + o.lossFee + o.extensionFee)).toLocaleString("id-ID")}
                               </span>
                             )}
                             {o.feeStatus === "PENDING_VERIFICATION" && (

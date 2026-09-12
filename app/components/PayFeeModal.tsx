@@ -23,11 +23,12 @@ export default function PayFeeModal({
 
   if (!isOpen || !order) return null;
 
-  const lateFee = order.lateFee || 0;
-  const extensionFee = order.extensionFee || 0;
-  const damageFee = order.damageFee || 0;
-  const lossFee = order.lossFee || 0;
-  const totalFee = lateFee + extensionFee + damageFee + lossFee;
+  const lateFee = order.unpaidLateFee !== undefined ? order.unpaidLateFee : (order.lateFee || 0);
+  const extensionFee = order.unpaidExtensionFee !== undefined ? order.unpaidExtensionFee : (order.extensionFee || 0);
+  const damageFee = order.unpaidDamageFee !== undefined ? order.unpaidDamageFee : (order.damageFee || 0);
+  const lossFee = order.unpaidLossFee !== undefined ? order.unpaidLossFee : (order.lossFee || 0);
+  const totalFee = order.unpaidTotalFee !== undefined ? order.unpaidTotalFee : (lateFee + extensionFee + damageFee + lossFee);
+  const paidExtensionFee = order.paidExtensionFee || 0;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -122,6 +123,12 @@ export default function PayFeeModal({
               <div className="flex justify-between text-slate-700">
                 <span>• Biaya Perpanjang Sewa (Extend):</span>
                 <span className="font-bold text-slate-900">Rp {extensionFee.toLocaleString("id-ID")}</span>
+              </div>
+            )}
+            {paidExtensionFee > 0 && extensionFee === 0 && (
+              <div className="flex justify-between text-emerald-800 bg-emerald-50 px-2 py-1 rounded text-[10px] border border-emerald-200">
+                <span>✓ Biaya Perpanjang Sewa (Extend):</span>
+                <span className="font-bold">LUNAS (Rp {paidExtensionFee.toLocaleString("id-ID")})</span>
               </div>
             )}
             {damageFee > 0 && (
