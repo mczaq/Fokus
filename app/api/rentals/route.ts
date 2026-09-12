@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { calculateOrderFees } from "@/app/lib/feeHelper";
 
 export async function GET(request: Request) {
   try {
@@ -36,10 +37,7 @@ export async function GET(request: Request) {
             equipment: true,
           },
         },
-        payments: {
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
+        payments: true,
       },
     });
 
@@ -69,6 +67,8 @@ export async function GET(request: Request) {
         parsedNotes = null;
       }
 
+      const feeBreakdown = calculateOrderFees(order);
+
       return {
         id: order.id,
         orderNumber: order.orderNumber,
@@ -83,6 +83,16 @@ export async function GET(request: Request) {
         damageFee: order.damageFee || 0,
         lossFee: order.lossFee || 0,
         feeStatus: order.feeStatus || "NONE",
+        unpaidLateFee: feeBreakdown.unpaidLateFee,
+        unpaidExtensionFee: feeBreakdown.unpaidExtensionFee,
+        unpaidDamageFee: feeBreakdown.unpaidDamageFee,
+        unpaidLossFee: feeBreakdown.unpaidLossFee,
+        unpaidTotalFee: feeBreakdown.unpaidTotalFee,
+        paidLateFee: feeBreakdown.paidLateFee,
+        paidExtensionFee: feeBreakdown.paidExtensionFee,
+        paidDamageFee: feeBreakdown.paidDamageFee,
+        paidLossFee: feeBreakdown.paidLossFee,
+        totalFee: feeBreakdown.totalFee,
         damageNotes: order.damageNotes || null,
         conditionStatus: order.conditionStatus || "NORMAL",
         agreementAccepted: order.agreementAccepted || false,

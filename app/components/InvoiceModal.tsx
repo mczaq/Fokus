@@ -38,6 +38,15 @@ interface InvoiceData {
   feeStatus?: string;
   conditionStatus?: string;
   damageNotes?: string;
+  unpaidLateFee?: number;
+  unpaidExtensionFee?: number;
+  unpaidDamageFee?: number;
+  unpaidLossFee?: number;
+  unpaidTotalFee?: number;
+  paidLateFee?: number;
+  paidExtensionFee?: number;
+  paidDamageFee?: number;
+  paidLossFee?: number;
 }
 
 interface InvoiceModalProps {
@@ -291,12 +300,24 @@ export default function InvoiceModal({ id, isOpen, onClose }: InvoiceModalProps)
             {/* Total Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-t border-neutral-100 pt-6">
               <div className="max-w-md">
-                {data.notes && (
-                  <>
-                    <h4 className="text-[8px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">CATATAN PESANAN:</h4>
-                    <p className="text-[10px] font-mono text-slate-500 italic leading-relaxed mb-4">{data.notes}</p>
-                  </>
-                )}
+                {(() => {
+                  let displayNotes = data.notes;
+                  try {
+                    if (data.notes && data.notes.trim().startsWith("{")) {
+                      const parsed = JSON.parse(data.notes);
+                      displayNotes = parsed.userNotes || "";
+                    }
+                  } catch {
+                    displayNotes = data.notes;
+                  }
+                  if (!displayNotes) return null;
+                  return (
+                    <>
+                      <h4 className="text-[8px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-1">CATATAN PESANAN:</h4>
+                      <p className="text-[10px] font-mono text-slate-500 italic leading-relaxed mb-4">{displayNotes}</p>
+                    </>
+                  );
+                })()}
                 {data.conditionStatus && data.conditionStatus !== "NORMAL" && (
                   <div className="p-3 border border-red-200 bg-red-50 text-[10px] font-mono">
                     <span className="font-bold text-red-750 block uppercase mb-1">HASIL INSPEKSI PENGEMBALIAN ({data.conditionStatus})</span>
@@ -305,51 +326,84 @@ export default function InvoiceModal({ id, isOpen, onClose }: InvoiceModalProps)
                 )}
               </div>
               <div className="w-full sm:w-72 shrink-0 sm:text-right font-mono">
-                <div className="flex justify-between sm:justify-end gap-10 py-1.5 text-xs text-slate-500">
-                  <span>Subtotal Pesanan:</span>
-                  <span className="text-slate-800">{formatIDR(data.totalAmount)}</span>
-                </div>
-                
-                {data.lateFee && data.lateFee > 0 ? (
-                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
-                    <span>Denda Terlambat:</span>
-                    <span>{formatIDR(data.lateFee)}</span>
-                  </div>
-                ) : null}
-                {data.damageFee && data.damageFee > 0 ? (
-                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
-                    <span>Denda Kerusakan:</span>
-                    <span>{formatIDR(data.damageFee)}</span>
-                  </div>
-                ) : null}
-                {data.lossFee && data.lossFee > 0 ? (
-                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
-                    <span>Denda Kehilangan:</span>
-                    <span>{formatIDR(data.lossFee)}</span>
-                  </div>
-                ) : null}
-                {data.extensionFee && data.extensionFee > 0 ? (
-                  <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600">
-                    <span>Biaya Perpanjangan:</span>
-                    <span>{formatIDR(data.extensionFee)}</span>
-                  </div>
-                ) : null}
+                {(() => {
+                  const baseSubtotal = (data.items || []).reduce(
+                    (sum, item) => sum + (item.subtotal || (item.price || 0) * (item.quantity || 1) * (item.duration || 1)),
+                    0
+                  ) || data.totalAmount;
+                  const isExtensionPaid = (data.paidExtensionFee || 0) >= (data.extensionFee || 0);
+                  const isDamagePaid = (data.paidDamageFee || 0) >= (data.damageFee || 0);
+                  const isLatePaid = (data.paidLateFee || 0) >= (data.lateFee || 0);
+                  const isLossPaid = (data.paidLossFee || 0) >= (data.lossFee || 0);
 
-                <div className="flex justify-between sm:justify-end gap-10 py-1.5 text-xs text-slate-500">
-                  <span>Pajak (0%):</span>
-                  <span className="text-slate-800">Rp 0</span>
-                </div>
-                
-                <div className="flex justify-between sm:justify-end gap-10 py-3 border-t border-neutral-200 text-sm font-bold text-neutral-950 mt-2">
-                  <span>Total Tagihan:</span>
-                  <span>{formatIDR(data.totalAmount + (data.lateFee || 0) + (data.damageFee || 0) + (data.lossFee || 0) + (data.extensionFee || 0))}</span>
-                </div>
-                
-                {data.feeStatus && data.feeStatus !== "NONE" && (
-                  <div className="text-[10px] font-bold text-slate-500 mt-1">
-                    Status Denda: <span className={data.feeStatus === "PAID" ? "text-green-700" : "text-rose-700 animate-pulse"}>{data.feeStatus}</span>
-                  </div>
-                )}
+                  return (
+                    <>
+                      <div className="flex justify-between sm:justify-end gap-10 py-1.5 text-xs text-slate-500">
+                        <span>Subtotal Sewa Awal:</span>
+                        <span className="text-slate-800">{formatIDR(baseSubtotal)}</span>
+                      </div>
+
+                      {/* Biaya perpanjangan (extend) hanya ditampilkan jika BELUM lunas. Jika sudah lunas, tidak ditampilkan lagi pada bill denda terbaru */}
+                      {data.extensionFee && data.extensionFee > 0 && !isExtensionPaid ? (
+                        <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-rose-600 font-bold">
+                          <span>Biaya Perpanjangan (Extend):</span>
+                          <span>{formatIDR(data.extensionFee)}</span>
+                        </div>
+                      ) : null}
+
+                      {data.lateFee && data.lateFee > 0 ? (
+                        <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-slate-700">
+                          <span>
+                            Denda Terlambat {isLatePaid ? <span className="text-green-700 text-[10px] font-bold">(Lunas)</span> : <span className="text-rose-600 text-[10px] font-bold">(Belum Lunas)</span>}:
+                          </span>
+                          <span>{formatIDR(data.lateFee)}</span>
+                        </div>
+                      ) : null}
+
+                      {data.damageFee && data.damageFee > 0 ? (
+                        <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-slate-700">
+                          <span>
+                            Denda Kerusakan {isDamagePaid ? <span className="text-green-700 text-[10px] font-bold">(Lunas)</span> : <span className="text-rose-600 text-[10px] font-bold">(Belum Lunas)</span>}:
+                          </span>
+                          <span className={isDamagePaid ? "text-slate-800" : "font-bold text-rose-700"}>{formatIDR(data.damageFee)}</span>
+                        </div>
+                      ) : null}
+
+                      {data.lossFee && data.lossFee > 0 ? (
+                        <div className="flex justify-between sm:justify-end gap-10 py-1 text-xs text-slate-700">
+                          <span>
+                            Denda Kehilangan {isLossPaid ? <span className="text-green-700 text-[10px] font-bold">(Lunas)</span> : <span className="text-rose-600 text-[10px] font-bold">(Belum Lunas)</span>}:
+                          </span>
+                          <span className={isLossPaid ? "text-slate-800" : "font-bold text-rose-700"}>{formatIDR(data.lossFee)}</span>
+                        </div>
+                      ) : null}
+
+                      <div className="flex justify-between sm:justify-end gap-10 py-1.5 text-xs text-slate-500">
+                        <span>Pajak (0%):</span>
+                        <span className="text-slate-800">Rp 0</span>
+                      </div>
+
+                      {data.unpaidTotalFee !== undefined && data.unpaidTotalFee > 0 ? (
+                        <div className="flex justify-between sm:justify-end gap-10 py-2.5 border-t-2 border-rose-600 text-sm font-bold text-rose-700 mt-2 bg-rose-50 px-2.5 rounded">
+                          <span>TOTAL TAGIHAN DENDA:</span>
+                          <span>{formatIDR(data.unpaidTotalFee)}</span>
+                        </div>
+                      ) : (
+                        <div className="flex justify-between sm:justify-end gap-10 py-2.5 border-t border-neutral-200 text-sm font-bold text-neutral-950 mt-2">
+                          <span>Total Tagihan:</span>
+                          <span className="text-emerald-700">{formatIDR(baseSubtotal + (data.extensionFee || 0) + (data.lateFee || 0) + (data.damageFee || 0) + (data.lossFee || 0))}</span>
+                        </div>
+                      )}
+
+                      <div className="text-[10px] font-bold text-slate-500 mt-1">
+                        Status Pembayaran:{" "}
+                        <span className={data.unpaidTotalFee === 0 || data.feeStatus === "PAID" ? "text-green-700" : "text-rose-700 animate-pulse"}>
+                          {data.unpaidTotalFee === 0 || data.feeStatus === "PAID" ? "✓ LUNAS" : "⚠️ BELUM LUNAS"}
+                        </span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 

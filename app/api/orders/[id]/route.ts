@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { OrderStatus, BookingStatus } from "../../../generated/prisma/client";
 import { syncEquipmentStock } from "@/app/lib/equipmentStock";
+import { calculateOrderFees } from "@/app/lib/feeHelper";
 
 export async function GET(
   request: Request,
@@ -21,6 +22,7 @@ export async function GET(
             service: { select: { name: true, image: true } },
           },
         },
+        payments: true,
       },
     });
 
@@ -36,6 +38,7 @@ export async function GET(
               service: { select: { name: true, image: true } },
             },
           },
+          payments: true,
         },
       });
     }
@@ -61,6 +64,8 @@ export async function GET(
         parsedNotes = null;
       }
 
+      const feeBreakdown = calculateOrderFees(order);
+
       return NextResponse.json({
         type: "order",
         id: order.orderNumber,
@@ -83,6 +88,16 @@ export async function GET(
         feeStatus: order.feeStatus,
         conditionStatus: order.conditionStatus,
         damageNotes: order.damageNotes,
+        unpaidLateFee: feeBreakdown.unpaidLateFee,
+        unpaidExtensionFee: feeBreakdown.unpaidExtensionFee,
+        unpaidDamageFee: feeBreakdown.unpaidDamageFee,
+        unpaidLossFee: feeBreakdown.unpaidLossFee,
+        unpaidTotalFee: feeBreakdown.unpaidTotalFee,
+        paidLateFee: feeBreakdown.paidLateFee,
+        paidExtensionFee: feeBreakdown.paidExtensionFee,
+        paidDamageFee: feeBreakdown.paidDamageFee,
+        paidLossFee: feeBreakdown.paidLossFee,
+        totalFee: feeBreakdown.totalFee,
       });
     }
 
@@ -167,11 +182,19 @@ export async function PUT(
     // 1. Try to find if this is an Order by orderNumber or ID
     let order = await prisma.order.findUnique({
       where: { orderNumber: cleanId },
+      include: {
+        items: true,
+        payments: true,
+      },
     });
 
     if (!order) {
       order = await prisma.order.findUnique({
         where: { id: cleanId },
+        include: {
+          items: true,
+          payments: true,
+        },
       });
     }
 
@@ -204,11 +227,24 @@ export async function PUT(
         updateData.lossFee = Number(lossFee || 0);
         updateData.lateFee = Number(lateFee || 0);
 
+        if (!parsedNotes.paidFeeDetails) {
+          parsedNotes.paidFeeDetails = {};
+        }
+        // If extensionFee was already paid prior to this return inspection, preserve it
+        const currentFees = calculateOrderFees(order);
+        if (currentFees.paidExtensionFee > 0) {
+          parsedNotes.paidFeeDetails.extensionFee = currentFees.paidExtensionFee;
+        } else if (order.extensionFee > 0 && order.feeStatus === "PAID") {
+          parsedNotes.paidFeeDetails.extensionFee = order.extensionFee;
+        }
+        updateData.notes = JSON.stringify(parsedNotes);
+
         const totalFees = updateData.damageFee + updateData.lossFee + updateData.lateFee;
         if (totalFees > 0) {
           updateData.feeStatus = "UNPAID";
         } else {
-          updateData.feeStatus = "NONE";
+          const isExtensionPaid = (parsedNotes.paidFeeDetails.extensionFee || 0) >= (order.extensionFee || 0);
+          updateData.feeStatus = isExtensionPaid ? (order.extensionFee > 0 ? "PAID" : "NONE") : "UNPAID";
         }
         updateData.status = "COMPLETED";
       } else if (action === "ACC_CANCEL") {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { calculateOrderFees } from "@/app/lib/feeHelper";
 
 export async function POST(
   request: Request,
@@ -10,12 +11,20 @@ export async function POST(
     const { paymentMethod, proofImage } = await request.json();
 
     let order = await prisma.order.findUnique({
-      where: { orderNumber: id }
+      where: { orderNumber: id },
+      include: {
+        items: true,
+        payments: true,
+      },
     });
 
     if (!order) {
       order = await prisma.order.findUnique({
-        where: { id: id }
+        where: { id: id },
+        include: {
+          items: true,
+          payments: true,
+        },
       });
     }
 
@@ -23,40 +32,65 @@ export async function POST(
       return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 });
     }
 
-    const totalFee = (order.lateFee || 0) + (order.extensionFee || 0) + (order.damageFee || 0) + (order.lossFee || 0);
+    const feeBreakdown = calculateOrderFees(order);
+    const amountToPay = feeBreakdown.unpaidTotalFee;
 
-    if (totalFee === 0) {
+    if (amountToPay <= 0) {
       return NextResponse.json({ error: "Tidak ada denda atau biaya tambahan yang perlu dibayar." }, { status: 400 });
     }
 
-    // Record Payment
+    // Record Payment with the exact unpaid amount
     await prisma.payment.create({
       data: {
-        amount: totalFee,
+        amount: amountToPay,
         method: paymentMethod || "TRANSFER",
         status: "CONFIRMED",
         proofImage: proofImage || null,
         confirmedAt: new Date(),
-        orderId: order.id
-      }
+        orderId: order.id,
+      },
     });
 
-    // Update Fee status
+    // Update notes to track that these fees have been settled
+    let parsedNotes: any = {};
+    if (order.notes) {
+      try {
+        if (order.notes.trim().startsWith("{")) {
+          parsedNotes = JSON.parse(order.notes);
+        } else {
+          parsedNotes = { userNotes: order.notes };
+        }
+      } catch {
+        parsedNotes = { userNotes: order.notes };
+      }
+    }
+
+    parsedNotes.paidFeeDetails = {
+      lateFee: order.lateFee || 0,
+      extensionFee: order.extensionFee || 0,
+      damageFee: order.damageFee || 0,
+      lossFee: order.lossFee || 0,
+    };
+
+    // Update fee status and totalAmount
     const updatedOrder = await prisma.order.update({
       where: { id: order.id },
       data: {
         feeStatus: "PAID",
-        totalAmount: order.totalAmount + totalFee
-      }
+        totalAmount: order.totalAmount + amountToPay,
+        notes: JSON.stringify(parsedNotes),
+      },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Pembayaran denda / biaya perpanjangan berhasil dikonfirmasi.",
-      order: updatedOrder
+      message: "Pembayaran denda / biaya tambahan berhasil dikonfirmasi.",
+      order: updatedOrder,
+      paidAmount: amountToPay,
     });
   } catch (error) {
     console.error("Error paying fee:", error);
     return NextResponse.json({ error: "Gagal memproses pembayaran denda" }, { status: 500 });
   }
 }
+

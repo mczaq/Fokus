@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
+import { calculateOrderFees } from "@/app/lib/feeHelper";
 
 export async function GET() {
   try {
@@ -49,7 +50,8 @@ export async function GET() {
       orderBy: { updatedAt: "desc" },
       include: {
         user: { select: { name: true, email: true, phone: true } },
-        items: { include: { equipment: true } }
+        items: { include: { equipment: true } },
+        payments: true,
       }
     });
 
@@ -57,6 +59,7 @@ export async function GET() {
     let totalPenaltyIncome = 0;
 
     penaltyOrders.forEach((o) => {
+      const breakdown = calculateOrderFees(o);
       const feeSum = (o.lateFee || 0) + (o.extensionFee || 0) + (o.damageFee || 0) + (o.lossFee || 0);
       totalPenaltyIncome += feeSum;
 
@@ -74,9 +77,19 @@ export async function GET() {
         damageFee: o.damageFee || 0,
         lossFee: o.lossFee || 0,
         totalFee: feeSum,
+        paidLateFee: breakdown.paidLateFee,
+        paidExtensionFee: breakdown.paidExtensionFee,
+        paidDamageFee: breakdown.paidDamageFee,
+        paidLossFee: breakdown.paidLossFee,
+        unpaidLateFee: breakdown.unpaidLateFee,
+        unpaidExtensionFee: breakdown.unpaidExtensionFee,
+        unpaidDamageFee: breakdown.unpaidDamageFee,
+        unpaidLossFee: breakdown.unpaidLossFee,
+        unpaidTotalFee: breakdown.unpaidTotalFee,
+        isAllFeesPaid: breakdown.isAllFeesPaid,
         conditionStatus: o.conditionStatus || "NORMAL",
         damageNotes: o.damageNotes || "—",
-        feeStatus: o.feeStatus || "UNPAID",
+        feeStatus: breakdown.isAllFeesPaid || o.feeStatus === "PAID" ? "PAID" : o.feeStatus || "UNPAID",
         date: o.updatedAt.toLocaleDateString("id-ID", {
           day: "numeric",
           month: "short",
