@@ -4,6 +4,8 @@ import { useAppData, Equipment, Studio, Service } from "@/app/context/AppDataCon
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Camera, Mic, BellRing, CheckCircle2, Search, Phone, Mail, Home, Check, AlertCircle, AlertTriangle, XCircle, Zap, X, Calendar, Package, MessageCircle, Hourglass, Landmark, Smartphone, Wallet, CreditCard, Star } from "lucide-react";
+
 
 export default function BookingPage() {
   const { user, isAuthenticated } = useAuth();
@@ -40,6 +42,7 @@ export default function BookingPage() {
   // Search/Filter for equipment
   const [equipSearch, setEquipSearch] = useState("");
   const [equipFilterCat, setEquipFilterCat] = useState("Semua");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -599,7 +602,12 @@ export default function BookingPage() {
                             {/* Equipment Image */}
                             <div className="h-32 w-full bg-slate-100 relative overflow-hidden border-b border-slate-100">
                               {eq.image ? (
-                                <img src={eq.image} alt={eq.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                                <img 
+                                  src={eq.image} 
+                                  alt={eq.name} 
+                                  onClick={() => setPreviewImage(eq.image!)}
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-pointer" 
+                                />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-slate-300">
                                   <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -1030,6 +1038,22 @@ export default function BookingPage() {
             )}
           </div>
 
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setPreviewImage(null)}
+        >
+          <img src={previewImage} className="max-w-full max-h-full rounded-lg shadow-2xl" alt="Preview" />
+          <button 
+            className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/80 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer transition-colors"
+            onClick={() => setPreviewImage(null)}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
       )}
     </div>

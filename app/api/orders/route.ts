@@ -65,6 +65,8 @@ export async function GET(request: Request) {
         items: o.items,
         lateFee: o.lateFee,
         extensionFee: o.extensionFee,
+        extensionRequestStatus: o.extensionRequestStatus,
+        extensionRequestDays: o.extensionRequestDays,
         damageFee: o.damageFee,
         lossFee: o.lossFee,
         feeStatus: o.feeStatus,
@@ -135,6 +137,11 @@ export async function GET(request: Request) {
         notes: b.notes,
         cancelRequest: parsedNotes?.cancelRequest || null,
         rescheduleRequest: parsedNotes?.rescheduleRequest || null,
+        extensionRequestStatus: b.extensionRequestStatus,
+        extensionRequestHours: b.extensionRequestHours,
+        extensionFee: b.extensionFee,
+        feeStatus: b.feeStatus,
+        duration: b.duration,
       };
     });
 

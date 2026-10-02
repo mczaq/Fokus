@@ -29,6 +29,34 @@ export async function POST(
     }
 
     if (!order) {
+      const studioBooking = await prisma.studioBooking.findUnique({
+        where: { id: id },
+      });
+
+      if (studioBooking) {
+        // Simple logic for Studio Booking payment
+        const amountToPay = studioBooking.extensionFee || 0;
+        
+        if (amountToPay <= 0 || studioBooking.feeStatus === "PAID") {
+          return NextResponse.json({ error: "Tidak ada denda atau biaya tambahan yang perlu dibayar." }, { status: 400 });
+        }
+
+        const updatedBooking = await prisma.studioBooking.update({
+          where: { id: studioBooking.id },
+          data: {
+            feeStatus: "PAID",
+            totalPrice: studioBooking.totalPrice + amountToPay,
+          },
+        });
+
+        return NextResponse.json({
+          success: true,
+          message: "Pembayaran perpanjangan studio berhasil dikonfirmasi.",
+          order: updatedBooking,
+          paidAmount: amountToPay,
+        });
+      }
+
       return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 });
     }
 

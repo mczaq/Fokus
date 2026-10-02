@@ -99,6 +99,8 @@ export async function GET(request: Request) {
         status: isOverdue ? "OVERDUE" : order.status,
         totalAmount: order.totalAmount,
         notes: order.notes,
+        extensionRequestStatus: order.extensionRequestStatus || "NONE",
+        extensionRequestDays: order.extensionRequestDays || 0,
         cancelRequest: parsedNotes?.cancelRequest || null,
         rescheduleRequest: parsedNotes?.rescheduleRequest || null,
         borrower: {
@@ -186,6 +188,10 @@ export async function GET(request: Request) {
         rawStatus: sb.status,
         totalAmount: sb.totalPrice,
         notes: sb.notes,
+        extensionRequestStatus: sb.extensionRequestStatus || "NONE",
+        extensionRequestHours: sb.extensionRequestHours || 0,
+        extensionFee: sb.extensionFee || 0,
+        feeStatus: sb.feeStatus || "NONE",
         cancelRequest: parsedNotes?.cancelRequest || null,
         rescheduleRequest: parsedNotes?.rescheduleRequest || null,
         borrower: {

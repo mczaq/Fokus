@@ -17,6 +17,7 @@ export default function PublicCatalogPage() {
   const { equipment, cart, addToCart, removeFromCart, updateCartQty } = useAppData();
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const activeItems = equipment.filter((e) => e.isActive);
 
@@ -124,7 +125,8 @@ export default function PublicCatalogPage() {
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onClick={() => { if (item.image) setPreviewImage(item.image); }}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-400">
@@ -237,6 +239,23 @@ export default function PublicCatalogPage() {
           )}
         </div>
       </main>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setPreviewImage(null)}
+        >
+          <img src={previewImage} className="max-w-full max-h-full rounded-lg shadow-2xl" alt="Preview" />
+          <button 
+            className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/80 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer transition-colors"
+            onClick={() => setPreviewImage(null)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      )}
+
       <Footer />
     </>
   );

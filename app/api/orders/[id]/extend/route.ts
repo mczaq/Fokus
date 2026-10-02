@@ -35,7 +35,30 @@ export async function POST(
     }
 
     if (!order) {
-      return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 });
+      // Coba cari di StudioBooking
+      const studioBooking = await prisma.studioBooking.findUnique({
+        where: { id: id },
+        include: { studio: true }
+      });
+
+      if (studioBooking) {
+        const hoursToAdd = Number(extraDays || 1); // For studio, extraDays means extraHours
+        const updatedBooking = await prisma.studioBooking.update({
+          where: { id: studioBooking.id },
+          data: {
+            extensionRequestStatus: "PENDING",
+            extensionRequestHours: hoursToAdd
+          }
+        });
+        
+        return NextResponse.json({
+          success: true,
+          message: `Berhasil mengajukan perpanjangan studio ${hoursToAdd} jam. Menunggu persetujuan admin.`,
+          order: updatedBooking
+        });
+      }
+
+      return NextResponse.json({ error: "Pesanan atau Booking tidak ditemukan" }, { status: 404 });
     }
 
     // Calculate total price for extra days based on daily rates
@@ -51,16 +74,14 @@ export async function POST(
     const updatedOrder = await prisma.order.update({
       where: { id: order.id },
       data: {
-        endDate: newEndDate,
-        extensionFee: order.extensionFee + extraCost,
-        feeStatus: "UNPAID",
-        status: "ACTIVE"
+        extensionRequestStatus: "PENDING",
+        extensionRequestDays: daysToAdd
       }
     });
 
     return NextResponse.json({
       success: true,
-      message: `Berhasil memperpanjang sewa ${daysToAdd} hari. Tagihan perpanjangan: Rp ${extraCost.toLocaleString("id-ID")}`,
+      message: `Berhasil mengajukan perpanjangan sewa ${daysToAdd} hari. Menunggu persetujuan admin.`,
       order: updatedOrder,
       extraCost
     });
