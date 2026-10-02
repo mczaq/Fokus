@@ -236,6 +236,28 @@ export default function OrdersPage() {
                                 ✓ Denda Lunas
                               </span>
                             )}
+
+                            {/* Payment verification state */}
+                            {o.paymentStatus === "PENDING" && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-amber-300 bg-amber-50 text-amber-700">
+                                ⏳ Bukti Pembayaran Menunggu Verifikasi Admin
+                              </span>
+                            )}
+                            {o.paymentStatus === "REJECTED" && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-rose-300 bg-rose-50 text-rose-700">
+                                ✕ Pembayaran Ditolak — silakan bayar ulang
+                              </span>
+                            )}
+                            {o.paymentStatus === "CONFIRMED" && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-green-300 bg-green-50 text-green-700">
+                                ✓ Pembayaran Terverifikasi
+                              </span>
+                            )}
+                            {o.paymentStatus === "REFUNDED" && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-indigo-300 bg-indigo-50 text-indigo-700">
+                                ↩ Pembayaran Direfund
+                              </span>
+                            )}
                           </div>
 
                           {/* Cancellation Request Badge / Details */}
@@ -399,12 +421,12 @@ export default function OrdersPage() {
                           {/* USER ACTIONS (PAYMENT, RESCHEDULE, CANCEL) */}
                           {!isAdmin && (
                             <div className="flex flex-col items-end gap-1.5 pt-1">
-                              {o.status === "Menunggu Pembayaran" && (
+                              {o.canPay && (
                                 <button
                                   onClick={() => handleSimulatePayment(o.id, o.rawAmount || 0)}
                                   className="btn-primary py-1.5 px-3 text-xs shadow-sm shadow-blue-500/20 w-[120px] cursor-pointer"
                                 >
-                                  Bayar Sekarang
+                                  {o.paymentStatus === "REJECTED" ? "Bayar Ulang" : "Bayar Sekarang"}
                                 </button>
                               )}
 

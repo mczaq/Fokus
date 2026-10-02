@@ -305,8 +305,8 @@ export default function PaymentSimulator({
               <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 mb-4 animate-bounce">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
-              <h3 className="font-serif italic font-bold text-base text-slate-900 mb-1">Pembayaran Sukses!</h3>
-              <p className="text-xs text-slate-500 max-w-[200px] leading-relaxed">Terima kasih. Sistem kami sedang memperbarui status pesanan Anda secara otomatis...</p>
+              <h3 className="font-serif italic font-bold text-base text-slate-900 mb-1">Bukti Pembayaran Terkirim!</h3>
+              <p className="text-xs text-slate-500 max-w-[220px] leading-relaxed">Terima kasih. Bukti pembayaran Anda akan <strong>diverifikasi oleh admin</strong>. Status pesanan diperbarui setelah pembayaran dikonfirmasi.</p>
             </div>
           ) : loading ? (
             /* Loading Screen */

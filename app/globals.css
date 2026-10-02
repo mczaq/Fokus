@@ -14,14 +14,22 @@
   
   --border-light: #e5e5e5;  /* Clean Minimal Border */
   --border-hover: #0a0a0a;  /* Crisp Black Border Focus */
+
+  /* Typography — Poppins everywhere (loaded via next/font as --font-poppins).
+     Defined on :root so hand-written CSS using var(--font-*) resolves too. */
+  --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-poppins), system-ui, sans-serif;
+  --font-mono: var(--font-poppins), ui-monospace, monospace;
 }
 
 @theme inline {
   --color-background: var(--bg-main);
   --color-foreground: var(--text-main);
   --color-primary: var(--primary);
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-serif: 'Playfair Display', Georgia, serif;
+  /* Map Tailwind's font-sans / font-serif / font-mono utilities to Poppins. */
+  --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-poppins), system-ui, sans-serif;
+  --font-mono: var(--font-poppins), ui-monospace, monospace;
 }
 
 * {

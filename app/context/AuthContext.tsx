@@ -39,12 +39,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true);
     const savedUser = localStorage.getItem("fokus_user");
-    if (savedUser) setUser(JSON.parse(savedUser));
+    const parsed: User | null = savedUser ? JSON.parse(savedUser) : null;
+    if (parsed) setUser(parsed);
 
     // Ambil daftar users dari backend jika login (bisa dibatasi hanya Admin, tapi kita muat saja)
     fetch("/api/users")
       .then(res => res.json())
-      .then(data => setUsers(data || []))
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        setUsers(data);
+        // Bersihkan sesi usang: mis. setelah database di-seed ulang, id user
+        // yang tersimpan di localStorage sudah tidak ada lagi di database.
+        // Tanpa ini, request yang memakai user.id akan gagal (chat 404,
+        // booking 500 karena foreign key).
+        if (parsed && !data.some((u: User) => u.id === parsed.id)) {
+          setUser(null);
+          localStorage.removeItem("fokus_user");
+        }
+      })
       .catch(e => console.error(e));
   }, []);
 
