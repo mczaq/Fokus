@@ -78,6 +78,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Guard against stale client sessions (e.g. after a DB reseed): a userId
+    // that no longer exists would otherwise crash on a foreign-key violation (500).
+    const userExists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!userExists) {
+      return NextResponse.json({ error: "Sesi Anda tidak valid. Silakan login ulang." }, { status: 401 });
+    }
+
     // Double-booking check with 30 minutes cooldown
     const bookingDate = new Date(date);
     const startOfDay = new Date(bookingDate);

@@ -18,7 +18,10 @@ export async function GET(request: Request) {
     });
 
     if (!currentUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      // Stale/unknown session (e.g. after a DB reseed): return an empty thread
+      // instead of 404 so the polling chat widget doesn't spam the console.
+      // The client clears the stale session and redirects to login.
+      return NextResponse.json([]);
     }
 
     const isAdmin = currentUser.role === "ADMIN" || currentUser.role === "SUPERUSER";

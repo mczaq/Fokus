@@ -126,14 +126,21 @@ export async function GET() {
           include: {
             user: { select: { name: true } }
           }
+        },
+        booking: {
+          select: {
+            id: true,
+            user: { select: { name: true } },
+            studio: { select: { name: true } }
+          }
         }
       }
     });
 
     const paymentsPreview = recentPayments.map((p) => ({
       id: p.id,
-      orderNumber: p.order.orderNumber,
-      user: p.order.user.name,
+      orderNumber: p.order?.orderNumber || (p.booking ? `STB-${p.booking.id.slice(-8).toUpperCase()}` : "—"),
+      user: p.order?.user?.name || p.booking?.user?.name || "Pelanggan",
       amount: p.amount,
       method: p.method,
       status: p.status,

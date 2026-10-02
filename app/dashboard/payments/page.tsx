@@ -11,6 +11,7 @@ export default function PaymentsPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [selectedProof, setSelectedProof] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) router.push("/login");
@@ -20,13 +21,39 @@ export default function PaymentsPage() {
   const loadData = async () => {
     try {
       const res = await fetch("/api/payments");
-      const data = await res.json();
-      setLogs(data || []);
+      const data = await res.json().catch(() => []);
+      // Guard against non-array responses (e.g. an { error } object on a 500)
+      // so the table render never crashes on logs.map.
+      setLogs(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
       setSyncing(false);
+    }
+  };
+
+  const verifyPayment = async (id: string, action: "ACCEPT" | "REJECT" | "REFUND") => {
+    const labels: Record<string, string> = { ACCEPT: "MENERIMA", REJECT: "MENOLAK", REFUND: "ME-REFUND" };
+    if (!confirm(`Yakin ${labels[action]} pembayaran ini?`)) return;
+    try {
+      setVerifyingId(id);
+      const res = await fetch(`/api/payments/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => null);
+        alert(d?.error || "Gagal memverifikasi pembayaran.");
+      } else {
+        await loadData();
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Terjadi kesalahan koneksi saat memverifikasi pembayaran.");
+    } finally {
+      setVerifyingId(null);
     }
   };
 
@@ -103,7 +130,7 @@ export default function PaymentsPage() {
                   Nominal
                 </th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 text-right">
-                  Status API
+                  Status &amp; Verifikasi
                 </th>
               </tr>
             </thead>
@@ -160,17 +187,61 @@ export default function PaymentsPage() {
                     </td>
                     <td className="px-6 py-4 text-sm font-bold text-slate-900">{log.amount}</td>
                     <td className="px-6 py-4 text-right">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-bold tracking-wider ${
-                          log.status === "Settled"
-                            ? "bg-green-100 text-green-700"
-                            : log.status === "Pending"
-                            ? "bg-neutral-100 text-neutral-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {log.status.toUpperCase()}
-                      </span>
+                      <div className="flex flex-col items-end gap-2">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-bold tracking-wider ${
+                            log.rawStatus === "CONFIRMED"
+                              ? "bg-green-100 text-green-700"
+                              : log.rawStatus === "PENDING"
+                              ? "bg-amber-100 text-amber-700"
+                              : log.rawStatus === "REFUNDED"
+                              ? "bg-indigo-100 text-indigo-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {log.status.toUpperCase()}
+                        </span>
+
+                        {log.rawStatus === "PENDING" && (
+                          <div className="flex flex-wrap gap-1.5 justify-end">
+                            <button
+                              disabled={verifyingId === log.id}
+                              onClick={() => verifyPayment(log.id, "ACCEPT")}
+                              className="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                              ✓ Terima
+                            </button>
+                            <button
+                              disabled={verifyingId === log.id}
+                              onClick={() => verifyPayment(log.id, "REJECT")}
+                              className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                              ✕ Tolak
+                            </button>
+                            <button
+                              disabled={verifyingId === log.id}
+                              onClick={() => verifyPayment(log.id, "REFUND")}
+                              className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-[11px] font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                              ↩ Refund
+                            </button>
+                          </div>
+                        )}
+
+                        {log.rawStatus === "CONFIRMED" && (
+                          <button
+                            disabled={verifyingId === log.id}
+                            onClick={() => verifyPayment(log.id, "REFUND")}
+                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-[11px] font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                          >
+                            ↩ Refund
+                          </button>
+                        )}
+
+                        {verifyingId === log.id && (
+                          <span className="text-[10px] text-slate-400 font-mono">Memproses...</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))

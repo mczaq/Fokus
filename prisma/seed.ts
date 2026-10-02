@@ -1,16 +1,9 @@
 import "dotenv/config";
 import { PrismaClient } from "../app/generated/prisma/client";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const url = new URL(process.env.DATABASE_URL!);
-const adapter = new PrismaMariaDb({
-  host: url.hostname,
-  port: parseInt(url.port || "3306"),
-  user: url.username,
-  password: url.password || undefined,
-  database: url.pathname.slice(1),
-});
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -68,7 +61,7 @@ async function main() {
   });
 
   const user1 = await prisma.user.upsert({
-    where: { email: "user@fokus.id" },
+    where: { email: " " },
     update: {
       phone: "081234567892",
       address: "Jl. Melati No. 15, Bandung",

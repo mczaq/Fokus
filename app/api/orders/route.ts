@@ -41,13 +41,22 @@ export async function GET(request: Request) {
 
       const feeBreakdown = calculateOrderFees(o);
 
+      // Payment verification state (latest payment wins)
+      const sortedPayments = (o.payments || []).slice().sort(
+        (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      const paymentStatus = sortedPayments[0]?.status || "NONE";
+      const canPay = o.status === "PENDING" && (paymentStatus === "NONE" || paymentStatus === "REJECTED");
+
       return {
         id: o.orderNumber,
         dbId: o.id,
         user: o.user.name,
         amount: "Rp " + o.totalAmount.toLocaleString("id-ID"),
         rawAmount: o.totalAmount,
-        status: o.status === "PENDING" ? "Menunggu Pembayaran" : 
+        paymentStatus,
+        canPay,
+        status: o.status === "PENDING" ? "Menunggu Pembayaran" :
                 o.status === "PROCESSING" ? "Diproses" : 
                 o.status === "ACTIVE" ? "Aktif" : 
                 o.status === "COMPLETED" ? "Selesai" : 
@@ -98,6 +107,7 @@ export async function GET(request: Request) {
       include: {
         user: { select: { name: true } },
         studio: { select: { name: true } },
+        payments: true,
       },
     };
 
@@ -117,13 +127,21 @@ export async function GET(request: Request) {
         parsedNotes = null;
       }
 
+      const sortedBookingPayments = (b.payments || []).slice().sort(
+        (a: any, c: any) => new Date(c.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      const bookingPaymentStatus = sortedBookingPayments[0]?.status || "NONE";
+      const bookingCanPay = b.status === "PENDING" && (bookingPaymentStatus === "NONE" || bookingPaymentStatus === "REJECTED");
+
       return {
         id: `STB-${b.id.slice(-8).toUpperCase()}`,
         dbId: b.id,
         user: b.user.name,
         amount: "Rp " + b.totalPrice.toLocaleString("id-ID"),
         rawAmount: b.totalPrice,
-        status: b.status === "PENDING" ? "Menunggu Pembayaran" : 
+        paymentStatus: bookingPaymentStatus,
+        canPay: bookingCanPay,
+        status: b.status === "PENDING" ? "Menunggu Pembayaran" :
                 b.status === "CONFIRMED" ? "Diproses" : 
                 b.status === "IN_USE" ? "Aktif" : 
                 b.status === "COMPLETED" ? "Selesai" : 

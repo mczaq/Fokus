@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 // ============================================
@@ -18,7 +18,7 @@ model User {
   password  String
   phone     String?
   role      Role     @default(USER)
-  avatar    String?  @db.LongText
+  avatar    String?  @db.Text
   address   String?  @db.Text
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -121,6 +121,8 @@ model StudioBooking {
   user     User   @relation(fields: [userId], references: [id])
   studioId String
   studio   Studio @relation(fields: [studioId], references: [id])
+
+  payments Payment[]
 
   @@map("studio_bookings")
 }
@@ -242,8 +244,11 @@ model Payment {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  bookingId String?
+  booking   StudioBooking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
