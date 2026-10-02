@@ -3,6 +3,24 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { 
+  BarChart3, 
+  Printer, 
+  RefreshCcw, 
+  Camera, 
+  AlertTriangle, 
+  Banknote, 
+  TrendingUp,
+  Wallet,
+  Landmark,
+  Smartphone,
+  Search,
+  CreditCard,
+  AlertCircle,
+  XCircle,
+  CheckCircle,
+  Check
+} from "lucide-react";
 
 export default function FinancePage() {
   const { user, isAuthenticated } = useAuth();
@@ -146,19 +164,19 @@ export default function FinancePage() {
             onClick={handleExportCSV}
             className="btn-secondary text-xs px-3.5 py-2 flex items-center gap-1.5 cursor-pointer border border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-mono"
           >
-            <span>📊</span> Export CSV
+            <BarChart3 className="w-4 h-4" /> Export CSV
           </button>
           <button
             onClick={() => window.print()}
             className="btn-secondary text-xs px-3.5 py-2 flex items-center gap-1.5 cursor-pointer font-mono"
           >
-            🖨️ Cetak
+            <Printer className="w-4 h-4" /> Cetak
           </button>
           <button
             onClick={loadData}
             className="btn-primary text-xs px-3.5 py-2 flex items-center gap-1.5 cursor-pointer font-mono"
           >
-            🔄 Refresh
+            <RefreshCcw className="w-4 h-4" /> Refresh
           </button>
         </div>
       </div>
@@ -178,8 +196,8 @@ export default function FinancePage() {
               {summary.rentalCount} transaksi sewa alat &amp; studio
             </span>
           </div>
-          <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
-            📷
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <Camera className="w-5 h-5" />
           </div>
         </div>
 
@@ -196,8 +214,8 @@ export default function FinancePage() {
               {summary.penaltyCount} denda / perbaikan
             </span>
           </div>
-          <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
-            ⚠️
+          <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
 
@@ -214,8 +232,8 @@ export default function FinancePage() {
               {summary.refundCount} pembatalan di-ACC
             </span>
           </div>
-          <div className="w-11 h-11 rounded-xl bg-neutral-100 text-neutral-600 flex items-center justify-center font-bold text-lg">
-            💸
+          <div className="w-11 h-11 rounded-xl bg-neutral-100 text-neutral-600 flex items-center justify-center">
+            <Banknote className="w-5 h-5" />
           </div>
         </div>
 
@@ -232,8 +250,8 @@ export default function FinancePage() {
               (Sewa + Denda) - Refund
             </span>
           </div>
-          <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">
-            📈
+          <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <TrendingUp className="w-5 h-5" />
           </div>
         </div>
       </div>
@@ -248,7 +266,7 @@ export default function FinancePage() {
               : "border-transparent text-slate-400 hover:text-slate-700"
           }`}
         >
-          📊 1. Buku Kas Persewaan Utama ({transactions.length})
+          <span className="flex items-center gap-1.5"><BarChart3 className="w-4 h-4" /> 1. Buku Kas Persewaan Utama ({transactions.length})</span>
         </button>
         <button
           onClick={() => setActiveTab("PENALTY_DAMAGE")}
@@ -258,7 +276,7 @@ export default function FinancePage() {
               : "border-transparent text-slate-400 hover:text-slate-700"
           }`}
         >
-          ⚠️ 2. Buku Kas Denda, Kerusakan &amp; Kehilangan ({penaltyTransactions.length})
+          <span className="flex items-center gap-1.5"><AlertTriangle className="w-4 h-4" /> 2. Buku Kas Denda, Kerusakan &amp; Kehilangan ({penaltyTransactions.length})</span>
         </button>
       </div>
 
@@ -276,19 +294,19 @@ export default function FinancePage() {
             </button>
             <button
               onClick={() => setFilterCategory("INCOME")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
                 filterCategory === "INCOME" ? "bg-white text-emerald-700 shadow-xs" : "text-slate-500"
               }`}
             >
-              💵 Sewa Masuk ({summary.rentalCount})
+              <Wallet className="w-3.5 h-3.5" /> Sewa Masuk ({summary.rentalCount})
             </button>
             <button
               onClick={() => setFilterCategory("REFUND")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
                 filterCategory === "REFUND" ? "bg-white text-neutral-700 shadow-xs" : "text-slate-500"
               }`}
             >
-              💸 Refund Keluar ({summary.refundCount})
+              <Banknote className="w-3.5 h-3.5" /> Refund Keluar ({summary.refundCount})
             </button>
           </div>
         ) : (
@@ -305,9 +323,7 @@ export default function FinancePage() {
             onChange={(e) => setSearch(e.target.value)}
             className="input-modern pl-9 py-2 text-xs font-mono"
           />
-          <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
         </div>
       </div>
 
@@ -364,8 +380,8 @@ export default function FinancePage() {
                         <td className="px-6 py-4 align-top">
                           {isRefund ? (
                             <div className="space-y-1">
-                              <span className="font-mono text-xs font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 block w-fit">
-                                🏦 {t.bankInfo}
+                              <span className="font-mono text-xs font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 w-fit flex items-center gap-1">
+                                <Landmark className="w-3.5 h-3.5" /> {t.bankInfo}
                               </span>
                               {t.whatsapp && t.whatsapp !== "—" && (
                                 <a
@@ -374,13 +390,13 @@ export default function FinancePage() {
                                   rel="noreferrer"
                                   className="text-[11px] font-mono text-emerald-600 hover:underline font-bold inline-flex items-center gap-1"
                                 >
-                                  📱 WA: {t.whatsapp}
+                                  <Smartphone className="w-3.5 h-3.5" /> WA: {t.whatsapp}
                                 </a>
                               )}
                             </div>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 font-mono">
-                              💳 {t.method}
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 font-mono">
+                              <CreditCard className="w-3.5 h-3.5" /> {t.method}
                             </span>
                           )}
                         </td>
@@ -451,11 +467,11 @@ export default function FinancePage() {
                         <p className="text-xs text-slate-500">{p.item}</p>
                       </td>
                       <td className="px-6 py-4 align-top space-y-1">
-                        <span className={`inline-block px-2 py-0.5 text-[10px] font-mono font-bold rounded ${
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-bold rounded ${
                           p.conditionStatus === "DAMAGED" ? "bg-neutral-200 text-neutral-900 border border-neutral-400" :
                           p.conditionStatus === "LOST" ? "bg-rose-100 text-rose-900 border border-rose-300" : "bg-emerald-100 text-emerald-900"
                         }`}>
-                          {p.conditionStatus === "DAMAGED" ? "🔴 RUSAK" : p.conditionStatus === "LOST" ? "❌ HILANG (TOTAL LOSS)" : "🟢 NORMAL"}
+                          {p.conditionStatus === "DAMAGED" ? <><AlertCircle className="w-3 h-3" /> RUSAK</> : p.conditionStatus === "LOST" ? <><XCircle className="w-3 h-3" /> HILANG (TOTAL LOSS)</> : <><CheckCircle className="w-3 h-3" /> NORMAL</>}
                         </span>
                         <p className="text-xs text-slate-600 italic">
                           "{p.damageNotes}"
@@ -496,10 +512,10 @@ export default function FinancePage() {
                             Sisa: {formatIDR(p.unpaidTotalFee)}
                           </div>
                         )}
-                        <span className={`inline-block px-2 py-0.5 text-[9px] font-mono font-bold rounded ${
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-mono font-bold rounded ${
                           p.feeStatus === "PAID" || p.unpaidTotalFee === 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800 animate-pulse"
                         }`}>
-                          {p.feeStatus === "PAID" || p.unpaidTotalFee === 0 ? "✓ LUNAS" : "⚠️ BELUM DIBAYAR"}
+                          {p.feeStatus === "PAID" || p.unpaidTotalFee === 0 ? <><Check className="w-3 h-3" /> LUNAS</> : <><AlertTriangle className="w-3 h-3" /> BELUM DIBAYAR</>}
                         </span>
                       </td>
                     </tr>

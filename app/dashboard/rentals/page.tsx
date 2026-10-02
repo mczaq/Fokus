@@ -4,6 +4,8 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Camera, Mic, BellRing, CheckCircle2, Search, Phone, Mail, Home, Check, AlertCircle, AlertTriangle, XCircle, Zap, X, Calendar, Package, MessageCircle, Hourglass, Landmark, Smartphone, Wallet, CreditCard, Star } from "lucide-react";
+
 import FormDetailModal from "@/app/components/FormDetailModal";
 import ReturnInspectionModal from "@/app/components/ReturnInspectionModal";
 import ProcessCancelModal from "@/app/components/ProcessCancelModal";
@@ -75,6 +77,9 @@ interface RentalRecord {
   notes?: string;
   cancelRequest?: any;
   rescheduleRequest?: any;
+  extensionRequestStatus?: string;
+  extensionRequestDays?: number;
+  extensionRequestHours?: number;
   borrower: Borrower;
   studio?: any;
   items: RentalItem[];
@@ -238,6 +243,24 @@ export default function RentalMonitoringPage() {
 
   const [categoryTab, setCategoryTab] = useState<"ALL" | "EQUIPMENT" | "STUDIO" | "SERVICE">("ALL");
 
+  const handleApproveExtend = async (rentalId: string, status: string) => {
+    try {
+      setUpdatingId(rentalId);
+      const res = await fetch(`/api/orders/${rentalId}/approve-extend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        await fetchRentals();
+      }
+    } catch (err) {
+      console.error("Error approving extend:", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   // Metrics calculation
   const totalRentals = rentals.length;
   const equipmentCount = rentals.filter((r) => r.type === "EQUIPMENT").length;
@@ -310,7 +333,7 @@ export default function RentalMonitoringPage() {
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            📷 Equipment ({equipmentCount})
+            <Camera className="w-4 h-4 inline-block mr-1" /> Equipment ({equipmentCount})
           </button>
           <button
             onClick={() => setCategoryTab("STUDIO")}
@@ -320,7 +343,7 @@ export default function RentalMonitoringPage() {
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            🎙️ Studio ({studioCount})
+            <Mic className="w-4 h-4 inline-block mr-1" /> Studio ({studioCount})
           </button>
           <button
             onClick={() => setCategoryTab("SERVICE")}
@@ -330,7 +353,7 @@ export default function RentalMonitoringPage() {
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            📸 Jasa Foto ({serviceCount})
+            <Camera className="w-4 h-4 inline-block mr-1" /> Jasa Foto ({serviceCount})
           </button>
           <button
             onClick={fetchRentals}
@@ -353,8 +376,8 @@ export default function RentalMonitoringPage() {
             <span className="text-3xl font-extrabold text-blue-600">{activeRentals}</span>
             <span className="text-xs text-slate-400 block mt-1">Barang aktif di lapangan</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-            📷
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <Camera className="w-6 h-6" />
           </div>
         </div>
 
@@ -365,8 +388,8 @@ export default function RentalMonitoringPage() {
             <span className="text-3xl font-extrabold text-neutral-700">{processingRentals}</span>
             <span className="text-xs text-slate-400 block mt-1">Lunas / Siap diserahkan</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-neutral-100 text-neutral-600 flex items-center justify-center font-bold">
-            ⏳
+          <div className="w-12 h-12 rounded-2xl bg-neutral-100 text-neutral-600 flex items-center justify-center">
+            <Hourglass className="w-6 h-6" />
           </div>
         </div>
 
@@ -377,8 +400,8 @@ export default function RentalMonitoringPage() {
             <span className="text-3xl font-extrabold text-rose-600">{overdueRentals}</span>
             <span className="text-xs text-slate-400 block mt-1">Lewat batas tenggat</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
-            🚨
+          <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <BellRing className="w-6 h-6" />
           </div>
         </div>
 
@@ -389,8 +412,8 @@ export default function RentalMonitoringPage() {
             <span className="text-3xl font-extrabold text-emerald-600">{completedRentals}</span>
             <span className="text-xs text-slate-400 block mt-1">Stok telah kembali</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            ✅
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6" />
           </div>
         </div>
       </div>
@@ -502,7 +525,7 @@ export default function RentalMonitoringPage() {
                                 />
                               ) : (
                                 <div className="w-10 h-10 bg-slate-200 rounded-lg shrink-0 flex items-center justify-center text-slate-500 font-bold text-base">
-                                  {record.type === "STUDIO" ? "🎙️" : record.type === "SERVICE" ? "📸" : "📷"}
+                                  {record.type === "STUDIO" ? "🎙️" : record.type === "SERVICE" ? "📸" : <Camera className="w-4 h-4 inline-block" />}
                                 </div>
                               )}
                               <div>
@@ -679,7 +702,19 @@ export default function RentalMonitoringPage() {
                             </div>
                           )}
                         </div>
-                      </td>
+
+                          {/* Extension Request Badge */}
+                          {record.extensionRequestStatus === "PENDING" && (
+                            <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                              <span className="text-[10px] font-bold text-amber-800 flex items-center gap-1">
+                                ⏳ Pengajuan Perpanjangan {record.type === "STUDIO" ? "Studio" : "Sewa"}
+                              </span>
+                              <p className="text-[10px] text-slate-700 mt-0.5">
+                                Durasi tambahan: <span className="font-bold">{record.type === "STUDIO" ? record.extensionRequestHours : record.extensionRequestDays} {record.type === "STUDIO" ? "Jam" : "Hari"}</span>
+                              </p>
+                            </div>
+                          )}
+                        </td>
 
                       {/* Quick Actions */}
                       <td className="px-5 py-4 align-top text-right space-y-1.5">
@@ -687,14 +722,14 @@ export default function RentalMonitoringPage() {
                         {record.cancelRequest?.status === "PENDING_ACC" ? (
                           <div className="flex flex-col items-end gap-1.5">
                             <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200 animate-pulse flex items-center gap-1">
-                              <span>🚨</span> Ada Pengajuan Batal User
+                              <BellRing className="w-3 h-3 inline-block mr-1" /> Ada Pengajuan Batal User
                             </span>
                             <button
                               disabled={isUpdating}
                               onClick={() => setProcessCancelRental(record)}
                               className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold cursor-pointer shadow-xs flex items-center gap-1"
                             >
-                              <span>⚡</span> Proses Pembatalan &amp; Refund
+                              <Zap className="w-3 h-3 inline-block mr-1" /> Proses Pembatalan &amp; Refund
                             </button>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <button
@@ -728,6 +763,29 @@ export default function RentalMonitoringPage() {
                               ✓ ACC Reschedule
                             </button>
                           </div>
+                        ) : record.extensionRequestStatus === "PENDING" ? (
+                          <div className="flex flex-col items-end gap-1.5">
+                            <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200 animate-pulse flex items-center gap-1">
+                              <span>⏳</span> Pengajuan Perpanjangan {record.type === "STUDIO" ? "Studio" : "Sewa"}
+                            </span>
+                            <p className="text-[10px] text-slate-600 font-mono">
+                              Tambah: <span className="font-bold">{record.type === "STUDIO" ? record.extensionRequestHours : record.extensionRequestDays} {record.type === "STUDIO" ? "Jam" : "Hari"}</span>
+                            </p>
+                            <button
+                              disabled={isUpdating}
+                              onClick={() => handleApproveExtend(record.id, "APPROVED")}
+                              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[11px] font-bold cursor-pointer shadow-xs flex items-center gap-1"
+                            >
+                              <Check className="w-3 h-3 inline-block mr-1" /> Setujui Perpanjangan
+                            </button>
+                            <button
+                              disabled={isUpdating}
+                              onClick={() => handleApproveExtend(record.id, "REJECTED")}
+                              className="px-2 py-0.5 text-slate-500 hover:bg-slate-100 border border-slate-200 rounded text-[10px] font-semibold cursor-pointer"
+                            >
+                              ✕ Tolak Perpanjangan
+                            </button>
+                          </div>
                         ) : record.status === "CANCELLED" ? (
                           <div className="flex flex-col items-end gap-1">
                             <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
@@ -749,7 +807,7 @@ export default function RentalMonitoringPage() {
                                 onClick={() => handleAction(record.id, "START_SESSION")}
                                 className="w-full sm:w-auto px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1 ml-auto"
                               >
-                                <span>🎙️</span> Mulai Sesi Studio
+                                <Mic className="w-3 h-3 inline-block mr-1" /> Mulai Sesi Studio
                               </button>
                             )}
 
@@ -759,7 +817,7 @@ export default function RentalMonitoringPage() {
                                 onClick={() => handleAction(record.id, "COMPLETE_SESSION")}
                                 className="w-full sm:w-auto px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1 ml-auto"
                               >
-                                <span>✅</span> Selesaikan Sesi Studio
+                                <CheckCircle2 className="w-3 h-3 inline-block mr-1" /> Selesaikan Sesi Studio
                               </button>
                             )}
 
@@ -788,7 +846,7 @@ export default function RentalMonitoringPage() {
                                 onClick={() => handleUpdateStatus(record.id, "CONFIRMED")}
                                 className="w-full sm:w-auto px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1 ml-auto"
                               >
-                                <span>✓</span> Konfirmasi Order
+                                <Check className="w-3 h-3 inline-block mr-1" /> Konfirmasi Order
                               </button>
                             )}
 
@@ -798,7 +856,7 @@ export default function RentalMonitoringPage() {
                                 onClick={() => handleUpdateStatus(record.id, "ACTIVE")}
                                 className="w-full sm:w-auto px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1 ml-auto"
                               >
-                                <span>📸</span> Mulai Sesi Foto
+                                <Camera className="w-3 h-3 inline-block mr-1" /> Mulai Sesi Foto
                               </button>
                             )}
 
@@ -808,7 +866,7 @@ export default function RentalMonitoringPage() {
                                 onClick={() => handleUpdateStatus(record.id, "COMPLETED")}
                                 className="w-full sm:w-auto px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1 ml-auto"
                               >
-                                <span>✅</span> Selesaikan Sesi Foto
+                                <CheckCircle2 className="w-3 h-3 inline-block mr-1" /> Selesaikan Sesi Foto
                               </button>
                             )}
 
@@ -837,7 +895,7 @@ export default function RentalMonitoringPage() {
                                 onClick={() => handleLogPickup(record.id)}
                                 className="w-full sm:w-auto px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
                               >
-                                {isUpdating ? "Memproses..." : "📦 Catat Actual Pickup (Serahkan)"}
+                                {isUpdating ? "Memproses..." : <><Package className="w-3 h-3 inline-block mr-1" /> Catat Actual Pickup (Serahkan)</>}
                               </button>
                             )}
 

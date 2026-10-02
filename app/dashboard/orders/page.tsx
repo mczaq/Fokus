@@ -3,6 +3,8 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Camera, Mic, BellRing, CheckCircle2, Search, Phone, Mail, Home, Check, AlertCircle, AlertTriangle, XCircle, Zap, X, Calendar, Package, MessageCircle, Hourglass, Landmark, Smartphone, Wallet, CreditCard, Star } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import InvoiceModal from "@/app/components/InvoiceModal";
 import PaymentSimulator from "@/app/components/PaymentSimulator";
@@ -103,6 +105,24 @@ export default function OrdersPage() {
       }
     } catch (err) {
       console.error("Error processing approval action:", err);
+    } finally {
+      setUpdatingActionId(null);
+    }
+  };
+
+  const handleApproveExtend = async (id: string, status: string) => {
+    try {
+      setUpdatingActionId(id + "_ext");
+      const res = await fetch(`/api/orders/${id}/approve-extend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        await fetchOrders();
+      }
+    } catch (err) {
+      console.error("Error approving extend:", err);
     } finally {
       setUpdatingActionId(null);
     }
@@ -286,6 +306,18 @@ export default function OrdersPage() {
                               </p>
                             </div>
                           )}
+
+                          {/* Extension Request Badge */}
+                          {o.extensionRequestStatus === "PENDING" && (
+                            <div className="bg-amber-50 p-2.5 rounded-xl border border-amber-200 text-xs space-y-1">
+                              <span className="font-bold text-amber-800 block">
+                                ⏳ Pengajuan Perpanjangan Sewa
+                              </span>
+                              <p className="text-slate-700 text-[11px]">
+                                Durasi tambahan: <span className="font-bold">{o.extensionRequestDays} Hari</span>
+                              </p>
+                            </div>
+                          )}
                         </td>
 
                         <td className="px-6 py-4 align-top text-right space-y-2">
@@ -299,7 +331,7 @@ export default function OrdersPage() {
                                 onClick={() => handleAdminAction(o.id, "ACC_CANCEL")}
                                 className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer shadow-xs"
                               >
-                                {isUpdating ? "Memproses..." : "✓ ACC Pembatalan (Kurangi Keuangan)"}
+                                {isUpdating ? "Memproses..." : <><Check className="w-3 h-3 inline-block mr-1" /> ACC Pembatalan (Kurangi Keuangan)</>}
                               </button>
                               <button
                                 disabled={isUpdating}
@@ -318,7 +350,7 @@ export default function OrdersPage() {
                                 onClick={() => handleAdminAction(o.id, "ACC_RESCHEDULE")}
                                 className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer shadow-xs"
                               >
-                                {isUpdating ? "Memproses..." : "✓ ACC Reschedule"}
+                                {isUpdating ? "Memproses..." : <span><Check className="w-3 h-3 inline-block mr-1" /> ACC Reschedule</span>}
                               </button>
                               <button
                                 disabled={isUpdating}
@@ -330,8 +362,27 @@ export default function OrdersPage() {
                             </div>
                           )}
 
+                          {isAdmin && o.extensionRequestStatus === "PENDING" && !hasPendingCancel && !hasPendingReschedule && (
+                            <div className="flex flex-col gap-1 items-end pt-1">
+                              <button
+                                disabled={isUpdating}
+                                onClick={() => handleApproveExtend(o.id, "APPROVED")}
+                                className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer shadow-xs"
+                              >
+                                {isUpdating ? "Memproses..." : <><Check className="w-3 h-3 inline-block mr-1" /> ACC Perpanjangan</>}
+                              </button>
+                              <button
+                                disabled={isUpdating}
+                                onClick={() => handleApproveExtend(o.id, "REJECTED")}
+                                className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold rounded-lg transition-colors cursor-pointer"
+                              >
+                                ✕ Tolak Perpanjangan
+                              </button>
+                            </div>
+                          )}
+
                           {/* STANDARD ADMIN STATUS DROPDOWN */}
-                          {isAdmin && !hasPendingCancel && !hasPendingReschedule && (
+                          {isAdmin && !hasPendingCancel && !hasPendingReschedule && o.extensionRequestStatus !== "PENDING" && (
                             <select
                               value={o.status}
                               onChange={(e) => handleAdminUpdateStatus(o.id, e.target.value)}
@@ -375,18 +426,16 @@ export default function OrdersPage() {
                                 !hasPendingCancel &&
                                 !hasPendingReschedule && (
                                   <div className="flex flex-wrap items-center justify-end gap-1.5">
-                                    {/* Extend Rental Button (Khusus Sewa Alat) */}
-                                    {!o.id?.startsWith("STB-") && (
-                                      <button
-                                        onClick={() => {
-                                          setExtendModalOrder(o);
-                                          setIsExtendOpen(true);
-                                        }}
-                                        className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 rounded text-[10px] font-mono font-bold transition-colors cursor-pointer"
-                                      >
-                                        ⏳ Extend Rental
-                                      </button>
-                                    )}
+                                    {/* Extend Rental Button */}
+                                    <button
+                                      onClick={() => {
+                                        setExtendModalOrder(o);
+                                        setIsExtendOpen(true);
+                                      }}
+                                      className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-800 rounded text-[10px] font-mono font-bold transition-colors cursor-pointer"
+                                    >
+                                      ⏳ Extend {o.id?.startsWith("STB-") ? "Studio" : "Rental"}
+                                    </button>
 
                                     <button
                                       onClick={() => {
