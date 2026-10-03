@@ -65,6 +65,7 @@ model Equipment {
   originalPrice Int    @default(0) // purchase/original value in IDR
   stock       Int      @default(1)
   available   Int      @default(1)
+  tag         String?  @default("") // Badge: Populer | Premium | Baru | ""
   image       String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())

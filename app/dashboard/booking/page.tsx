@@ -43,6 +43,7 @@ export default function BookingPage() {
   const [equipSearch, setEquipSearch] = useState("");
   const [equipFilterCat, setEquipFilterCat] = useState("Semua");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [detailEquipment, setDetailEquipment] = useState<Equipment | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -103,6 +104,15 @@ export default function BookingPage() {
 
   const formatIDR = (n: number) => "Rp " + n.toLocaleString("id-ID");
 
+  // Today's date as YYYY-MM-DD in local timezone (avoids UTC off-by-one for WIB/WITA/WIT).
+  const todayStr = () => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
   // Helper: calculate studio duration and price
   const getStudioDurationHours = () => {
     if (!studioStartTime || !studioEndTime) return 0;
@@ -158,6 +168,10 @@ export default function BookingPage() {
         setErrorMsg("Pilih tanggal sewa studio.");
         return false;
       }
+      if (studioDate < todayStr()) {
+        setErrorMsg("Tanggal sewa tidak boleh sebelum hari ini.");
+        return false;
+      }
       const hrs = getStudioDurationHours();
       if (hrs <= 0) {
         setErrorMsg("Jam selesai harus setelah jam mulai.");
@@ -194,9 +208,17 @@ export default function BookingPage() {
         setErrorMsg("Pilih tanggal pelaksanaan jasa.");
         return false;
       }
+      if (serviceDate < todayStr()) {
+        setErrorMsg("Tanggal pelaksanaan tidak boleh sebelum hari ini.");
+        return false;
+      }
     } else if (bookingType === "equipment") {
       if (!equipStartDate || !equipEndDate) {
         setErrorMsg("Pilih tanggal mulai dan tanggal selesai sewa.");
+        return false;
+      }
+      if (equipStartDate < todayStr()) {
+        setErrorMsg("Tanggal mulai sewa tidak boleh sebelum hari ini.");
         return false;
       }
       const days = getEquipDurationDays();
@@ -616,11 +638,26 @@ export default function BookingPage() {
                               <span className={`absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-md ${eq.available > 0 ? "bg-emerald-600/90 text-white" : "bg-slate-800/90 text-slate-200"}`}>
                                 {eq.available > 0 ? `Stok: ${eq.available}` : "Habis"}
                               </span>
+                              {eq.tag && (
+                                <span className="absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-md bg-black text-white shadow-sm uppercase tracking-wide">
+                                  {eq.tag}
+                                </span>
+                              )}
                             </div>
                             <div className="p-3">
                               <span className="text-[9px] font-bold text-neutral-800 uppercase tracking-widest">{eq.brand} · {eq.category}</span>
                               <h4 className="font-bold text-xs text-slate-900 mt-0.5 line-clamp-1">{eq.name}</h4>
-                              <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">{eq.description}</p>
+                              <button
+                                type="button"
+                                onClick={() => setDetailEquipment(eq)}
+                                title="Klik untuk baca deskripsi lengkap"
+                                className="text-left w-full group/desc cursor-pointer"
+                              >
+                                <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed group-hover/desc:text-slate-700 transition-colors">{eq.description}</p>
+                                <span className="text-[10px] font-bold text-black underline underline-offset-2 mt-0.5 inline-block">
+                                  Selengkapnya
+                                </span>
+                              </button>
                             </div>
                           </div>
                           
@@ -731,7 +768,7 @@ export default function BookingPage() {
                         required
                         value={studioDate}
                         onChange={(e) => setStudioDate(e.target.value)}
-                        min={new Date().toISOString().split("T")[0]}
+                        min={todayStr()}
                         className="input-modern py-2 text-xs"
                       />
                     </div>
@@ -785,7 +822,7 @@ export default function BookingPage() {
                         required
                         value={serviceDate}
                         onChange={(e) => setServiceDate(e.target.value)}
-                        min={new Date().toISOString().split("T")[0]}
+                        min={todayStr()}
                         className="input-modern py-2 text-xs"
                       />
                     </div>
@@ -816,7 +853,7 @@ export default function BookingPage() {
                         required
                         value={equipStartDate}
                         onChange={(e) => setEquipStartDate(e.target.value)}
-                        min={new Date().toISOString().split("T")[0]}
+                        min={todayStr()}
                         className="input-modern py-2 text-xs"
                       />
                     </div>
@@ -827,7 +864,7 @@ export default function BookingPage() {
                         required
                         value={equipEndDate}
                         onChange={(e) => setEquipEndDate(e.target.value)}
-                        min={equipStartDate || new Date().toISOString().split("T")[0]}
+                        min={equipStartDate || todayStr()}
                         className="input-modern py-2 text-xs"
                       />
                     </div>
@@ -1043,17 +1080,123 @@ export default function BookingPage() {
 
       {/* Image Preview Modal */}
       {previewImage && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
           onClick={() => setPreviewImage(null)}
         >
           <img src={previewImage} className="max-w-full max-h-full rounded-lg shadow-2xl" alt="Preview" />
-          <button 
+          <button
             className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/80 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer transition-colors"
             onClick={() => setPreviewImage(null)}
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+      )}
+
+      {/* Equipment Detail Modal */}
+      {detailEquipment && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setDetailEquipment(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header image */}
+            <div className="h-48 w-full bg-slate-100 relative shrink-0">
+              {detailEquipment.image ? (
+                <>
+                  <img
+                    src={detailEquipment.image}
+                    alt={detailEquipment.name}
+                    onClick={() => setPreviewImage(detailEquipment.image!)}
+                    title="Klik untuk lihat foto ukuran penuh"
+                    className="w-full h-full object-cover cursor-zoom-in hover:scale-105 transition-transform duration-300"
+                  />
+                  <span className="absolute bottom-3 left-3 bg-black/60 text-white text-[10px] font-bold px-2.5 py-1 rounded-md pointer-events-none">
+                    🔍 Klik untuk foto penuh
+                  </span>
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+              )}
+              <button
+                className="absolute top-3 right-3 text-white bg-black/50 hover:bg-black/80 rounded-full w-9 h-9 flex items-center justify-center cursor-pointer transition-colors"
+                onClick={() => setDetailEquipment(null)}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scrollable body */}
+            <div className="p-6 overflow-y-auto">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-bold text-neutral-800 uppercase tracking-widest">{detailEquipment.brand} · {detailEquipment.category}</span>
+                {detailEquipment.tag && (
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-black text-white uppercase tracking-wide">{detailEquipment.tag}</span>
+                )}
+              </div>
+              <h3 className="font-bold text-slate-900 text-xl mt-1 mb-3">{detailEquipment.name}</h3>
+
+              <div className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">Deskripsi</div>
+              <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line mb-4">{detailEquipment.description}</p>
+
+              {detailEquipment.specs && (
+                <>
+                  <div className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">Spesifikasi</div>
+                  <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line mb-4">{detailEquipment.specs}</p>
+                </>
+              )}
+
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div>
+                  <div className="text-[10px] text-slate-400">Harga/Hari</div>
+                  <div className="text-base font-extrabold text-neutral-950">{formatIDR(detailEquipment.pricePerDay)}</div>
+                </div>
+                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md ${detailEquipment.available > 0 ? "bg-emerald-600/90 text-white" : "bg-slate-800/90 text-slate-200"}`}>
+                  {detailEquipment.available > 0 ? `Stok: ${detailEquipment.available}` : "Stok Habis"}
+                </span>
+              </div>
+            </div>
+
+            {/* Footer action */}
+            <div className="p-4 border-t border-slate-100 shrink-0 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setDetailEquipment(null)}
+                className="btn-secondary py-2 px-5 text-sm font-semibold rounded-xl"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (detailEquipment.available > 0 && !cart.find((entry) => entry.equipment.id === detailEquipment.id)) {
+                    addToCart(detailEquipment);
+                  }
+                  setDetailEquipment(null);
+                }}
+                disabled={detailEquipment.available <= 0 || !!cart.find((entry) => entry.equipment.id === detailEquipment.id)}
+                className={`flex-1 py-2 px-5 text-sm font-bold rounded-xl transition-colors ${
+                  detailEquipment.available <= 0
+                    ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                    : cart.find((entry) => entry.equipment.id === detailEquipment.id)
+                    ? "bg-emerald-100 text-emerald-700 cursor-not-allowed"
+                    : "bg-black hover:bg-neutral-800 text-white cursor-pointer"
+                }`}
+              >
+                {detailEquipment.available <= 0
+                  ? "Stok Habis"
+                  : cart.find((entry) => entry.equipment.id === detailEquipment.id)
+                  ? "✓ Sudah di Keranjang"
+                  : "+ Tambah ke Keranjang"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
