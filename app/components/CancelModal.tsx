@@ -9,6 +9,9 @@ interface CancelModalProps {
   onSuccess: () => void;
 }
 
+const fieldClass =
+  "w-full bg-white border border-neutral-300 px-3 py-2 text-xs font-mono text-slate-800 placeholder:text-neutral-400 focus:outline-none focus:border-black transition-colors";
+
 export default function CancelModal({
   orderId,
   isOpen,
@@ -72,96 +75,103 @@ export default function CancelModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[150] overflow-y-auto flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-fade-up border border-slate-100">
-        {/* Modal Header */}
-        <div className="px-6 py-4 bg-rose-50/70 border-b border-rose-100 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-rose-700">
-            <span className="text-xl">⚠️</span>
-            <h3 className="font-bold text-slate-900 text-base">
-              Form Pengajuan Pembatalan &amp; Refund
-            </h3>
+    <div className="fixed inset-0 z-[150] overflow-y-auto flex items-center justify-center p-4 font-sans">
+      <div className="absolute inset-0 bg-neutral-950/70 backdrop-blur-xs" onClick={onClose} />
+
+      <div className="bg-[#FAF9F5] border border-neutral-300 w-full max-w-lg relative shadow-2xl overflow-hidden animate-fade-up z-10">
+        {/* Header */}
+        <div className="bg-slate-900 text-white p-5 border-b border-slate-800 flex justify-between items-center">
+          <div>
+            <span className="text-[9px] font-mono uppercase tracking-widest text-neutral-400 font-bold block">
+              PEMBATALAN &amp; REFUND
+            </span>
+            <h2 className="text-sm font-serif italic font-bold text-white">
+              {orderId}
+            </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-white font-mono text-sm cursor-pointer"
           >
             ✕
           </button>
         </div>
 
-        {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
-            ID Pesanan: <strong className="font-mono text-slate-900">{orderId}</strong>
-            <p className="mt-1 text-[11px] text-slate-500 leading-relaxed">
-              Pengajuan Anda akan ditinjau oleh Admin. Setelah disetujui (ACC), status pesanan akan menjadi <strong>Dibatalkan</strong>, stok barang dikembalikan, dan dana diproses ke nomor rekening Anda.
-            </p>
-          </div>
-
-          {errorMsg && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold">
-              {errorMsg}
+        {/* Content + Footer (wrapped in form so submit button works) */}
+        <form onSubmit={handleSubmit}>
+          <div className="p-6 space-y-4 font-mono text-xs text-slate-800 bg-white">
+            <div className="p-3 bg-neutral-50 border border-neutral-200 rounded space-y-1">
+              <div className="text-[10px] text-slate-400 uppercase">Informasi Pengajuan</div>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Pengajuan Anda akan ditinjau oleh Admin. Setelah disetujui (ACC), status pesanan menjadi{" "}
+                <strong className="text-slate-900">Dibatalkan</strong>, stok barang dikembalikan, dan dana diproses ke nomor rekening Anda.
+              </p>
             </div>
-          )}
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Alasan Pembatalan *
-            </label>
-            <textarea
-              required
-              rows={3}
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Contoh: Ada acara keluarga mendadak, perubahan lokasi kegiatan, dll..."
-              className="input-modern text-xs py-2 resize-none"
-            />
+            {errorMsg && (
+              <p className="text-[10px] text-rose-600 font-mono font-bold bg-rose-50 p-2 border border-rose-200">
+                {errorMsg}
+              </p>
+            )}
+
+            <div>
+              <label className="text-[10px] uppercase font-bold text-slate-700 block mb-1.5">
+                Alasan Pembatalan *
+              </label>
+              <textarea
+                required
+                rows={3}
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Contoh: Ada acara keluarga mendadak, perubahan lokasi kegiatan, dll..."
+                className={`${fieldClass} resize-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] uppercase font-bold text-slate-700 block mb-1.5">
+                Nomor Rekening &amp; Nama Bank / E-Wallet (Untuk Refund) *
+              </label>
+              <input
+                type="text"
+                required
+                value={bankInfo}
+                onChange={(e) => setBankInfo(e.target.value)}
+                placeholder="Contoh: BCA 1234567890 a.n Ahmad Dahlan"
+                className={fieldClass}
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] uppercase font-bold text-slate-700 block mb-1.5">
+                Nomor WhatsApp / HP Aktif *
+              </label>
+              <input
+                type="text"
+                required
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="Contoh: 081234567890"
+                className={fieldClass}
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Nomor Rekening &amp; Nama Bank / E-Wallet (Untuk Refund) *
-            </label>
-            <input
-              type="text"
-              required
-              value={bankInfo}
-              onChange={(e) => setBankInfo(e.target.value)}
-              placeholder="Contoh: BCA 1234567890 a.n Ahmad Dahlan"
-              className="input-modern text-xs py-2"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Nomor WhatsApp / HP Aktif *
-            </label>
-            <input
-              type="text"
-              required
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="Contoh: 081234567890"
-              className="input-modern text-xs py-2 font-mono"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          {/* Footer */}
+          <div className="p-4 bg-slate-50 flex justify-between items-center border-t border-neutral-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              className="px-4 py-2 border border-neutral-300 text-slate-600 font-mono text-xs uppercase cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50"
+              className="px-5 py-2.5 bg-black hover:bg-neutral-800 text-white font-mono text-xs font-bold uppercase tracking-widest transition-colors shadow-md disabled:opacity-50 cursor-pointer"
             >
-              {loading ? "Mengirim..." : "Kirim Pengajuan Pembatalan"}
+              {loading ? "Mengirim..." : "Kirim Pengajuan"}
             </button>
           </div>
         </form>
