@@ -3,6 +3,7 @@ import prisma from "@/app/lib/prisma";
 import { sendOrderNotificationEmail } from "@/app/lib/email";
 import { syncEquipmentStock } from "@/app/lib/equipmentStock";
 import { calculateOrderFees } from "@/app/lib/feeHelper";
+import { computeLateFee } from "@/app/lib/lateFee";
 
 export async function GET(request: Request) {
   try {
@@ -39,7 +40,12 @@ export async function GET(request: Request) {
         parsedNotes = null;
       }
 
-      const feeBreakdown = calculateOrderFees(o);
+      // Denda keterlambatan otomatis berjalan (hari telat × tarif harian item)
+      // selama barang belum dikembalikan dan sudah melewati jatuh tempo.
+      const late = computeLateFee(o);
+      const effectiveLateFee = late.isLate ? late.lateFee : Number(o.lateFee || 0);
+
+      const feeBreakdown = calculateOrderFees({ ...o, lateFee: effectiveLateFee });
 
       // Payment verification state (latest payment wins)
       const sortedPayments = (o.payments || []).slice().sort(
@@ -72,7 +78,11 @@ export async function GET(request: Request) {
                   : "Pesanan Layanan/Sewa") 
           : "Detail",
         items: o.items,
-        lateFee: o.lateFee,
+        lateFee: effectiveLateFee,
+        lateFeePerDay: late.dailyRate,
+        daysLate: late.daysLate,
+        overdueHours: late.overdueHours,
+        isOverdue: late.isLate,
         extensionFee: o.extensionFee,
         extensionRequestStatus: o.extensionRequestStatus,
         extensionRequestDays: o.extensionRequestDays,

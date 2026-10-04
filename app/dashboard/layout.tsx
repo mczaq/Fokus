@@ -4,6 +4,9 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ChatWindow from "../components/ChatWindow";
+import { NotificationProvider } from "../context/NotificationContext";
+import NotificationBell from "../components/NotificationBell";
+import OverdueReturnPopup from "../components/OverdueReturnPopup";
 
 interface NavItem {
   label: string;
@@ -318,7 +321,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </aside>
   );
 
-  return (
+  const isCustomer = user.role === "user";
+
+  const tree = (
     <div className="min-h-screen bg-[#FAF9F5] flex">
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex w-64 shrink-0 flex-col fixed inset-y-0 left-0 z-30">
@@ -337,25 +342,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:pl-64">
-        {/* Mobile Top Bar */}
-        <header className="lg:hidden bg-[#FAF9F5] border-b border-[#e7e6df] px-4 h-14 flex items-center justify-between sticky top-0 z-20">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 text-slate-700"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          </button>
+        {/* Top Bar — selalu tampil untuk customer (agar lonceng di pojok kanan atas
+            terlihat di desktop & mobile); untuk admin tetap hanya di mobile. */}
+        <header
+          className={`${
+            isCustomer ? "flex" : "flex lg:hidden"
+          } bg-[#FAF9F5] border-b border-[#e7e6df] px-4 h-14 items-center justify-between sticky top-0 z-20`}
+        >
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 border border-neutral-950 flex items-center justify-center text-neutral-950 font-bold relative font-serif italic text-xs">
-              <span className="absolute top-0 left-0 w-0.5 h-0.5 border-t border-l border-neutral-950"></span>
-              <span className="absolute top-0 right-0 w-0.5 h-0.5 border-t border-r border-neutral-950"></span>
-              <span className="absolute bottom-0 left-0 w-0.5 h-0.5 border-b border-l border-neutral-950"></span>
-              <span className="absolute bottom-0 right-0 w-0.5 h-0.5 border-b border-r border-neutral-950"></span>
-              F
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 text-slate-700 cursor-pointer"
+              aria-label="Buka menu"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div className="flex items-center gap-2 lg:hidden">
+              <div className="w-7 h-7 border border-neutral-950 flex items-center justify-center text-neutral-950 font-bold relative font-serif italic text-xs">
+                <span className="absolute top-0 left-0 w-0.5 h-0.5 border-t border-l border-neutral-950"></span>
+                <span className="absolute top-0 right-0 w-0.5 h-0.5 border-t border-r border-neutral-950"></span>
+                <span className="absolute bottom-0 left-0 w-0.5 h-0.5 border-b border-l border-neutral-950"></span>
+                <span className="absolute bottom-0 right-0 w-0.5 h-0.5 border-b border-r border-neutral-950"></span>
+                F
+              </div>
+              <span className="font-bold text-slate-900 font-mono tracking-widest text-xs uppercase">Fokus</span>
             </div>
-            <span className="font-bold text-slate-900 font-mono tracking-widest text-xs uppercase">Fokus</span>
           </div>
-          <div className="w-8" />
+
+          <div className="flex items-center gap-2">
+            {isCustomer ? <NotificationBell /> : <div className="w-8" />}
+          </div>
         </header>
 
         {/* Page Content */}
@@ -364,6 +380,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <ChatWindow />
         </main>
       </div>
+
+      {/* Pop-up pengingat keterlambatan di semua halaman customer */}
+      {isCustomer && <OverdueReturnPopup />}
     </div>
   );
+
+  if (isCustomer) {
+    return <NotificationProvider userId={user.id}>{tree}</NotificationProvider>;
+  }
+
+  return tree;
 }

@@ -3,6 +3,7 @@ import prisma from "@/app/lib/prisma";
 import { OrderStatus, BookingStatus } from "../../../generated/prisma/client";
 import { syncEquipmentStock } from "@/app/lib/equipmentStock";
 import { calculateOrderFees } from "@/app/lib/feeHelper";
+import { computeLateFee } from "@/app/lib/lateFee";
 
 export async function GET(
   request: Request,
@@ -64,7 +65,9 @@ export async function GET(
         parsedNotes = null;
       }
 
-      const feeBreakdown = calculateOrderFees(order);
+      const late = computeLateFee(order);
+      const effectiveLateFee = late.isLate ? late.lateFee : order.lateFee || 0;
+      const feeBreakdown = calculateOrderFees({ ...order, lateFee: effectiveLateFee });
 
       return NextResponse.json({
         type: "order",
@@ -81,7 +84,11 @@ export async function GET(
         endDate: order.endDate,
         user: order.user,
         items,
-        lateFee: order.lateFee,
+        lateFee: effectiveLateFee,
+        lateFeePerDay: late.dailyRate,
+        daysLate: late.daysLate,
+        overdueHours: late.overdueHours,
+        isOverdue: late.isLate,
         extensionFee: order.extensionFee,
         damageFee: order.damageFee,
         lossFee: order.lossFee,

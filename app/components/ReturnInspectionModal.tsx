@@ -47,7 +47,9 @@ export default function ReturnInspectionModal({
     setError(null);
     try {
       const calculatedLossFee = condition === "LOST" ? totalItemValue : 0;
-      const calculatedLateFee = rental.isOverdue ? (rental.overdueHours || 1) * 25000 : 0;
+      // Denda keterlambatan final = nilai denda otomatis berjalan (hari telat ×
+      // tarif harian item) yang sudah dihitung & ditampilkan oleh API rentals.
+      const calculatedLateFee = rental.isOverdue ? Number(rental.lateFee || 0) : 0;
 
       const res = await fetch(`/api/orders/${rental.id}`, {
         method: "PUT",
@@ -106,7 +108,8 @@ export default function ReturnInspectionModal({
             </div>
             {rental.isOverdue && (
               <div className="mt-1 text-[10px] font-bold text-rose-700 bg-rose-50 p-1 border border-rose-200">
-                ⚠️ Terlambat: {rental.overdueHours || 1} jam (Denda keterlambatan otomatis ditagihkan)
+                ⚠️ Terlambat {rental.daysLate || 1} hari — Denda otomatis Rp {Number(rental.lateFee || 0).toLocaleString("id-ID")}
+                {rental.lateFeePerDay ? ` (Rp ${Number(rental.lateFeePerDay).toLocaleString("id-ID")}/hari)` : ""}
               </div>
             )}
           </div>

@@ -237,6 +237,13 @@ export default function OrdersPage() {
                               </span>
                             )}
 
+                            {/* Denda keterlambatan berjalan (barang belum dikembalikan & lewat jatuh tempo) */}
+                            {o.isOverdue && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-rose-300 bg-rose-50 text-rose-700 animate-pulse">
+                                🔴 Terlambat {o.daysLate || 1} hari — Denda berjalan Rp {Number(o.lateFee || 0).toLocaleString("id-ID")}
+                              </span>
+                            )}
+
                             {/* Payment verification state */}
                             {o.paymentStatus === "PENDING" && (
                               <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-amber-300 bg-amber-50 text-amber-700">

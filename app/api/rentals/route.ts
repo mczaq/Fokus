@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { calculateOrderFees } from "@/app/lib/feeHelper";
+import { computeLateFee } from "@/app/lib/lateFee";
 
 export async function GET(request: Request) {
   try {
@@ -78,7 +79,12 @@ export async function GET(request: Request) {
         parsedNotes = null;
       }
 
-      const feeBreakdown = calculateOrderFees(order);
+      // Denda keterlambatan otomatis: selama barang belum dikembalikan dan sudah
+      // lewat jatuh tempo, denda dihitung berjalan (hari telat × tarif harian item).
+      const late = computeLateFee({ ...order, endDate }, now);
+      const effectiveLateFee = late.isLate ? late.lateFee : order.lateFee || 0;
+
+      const feeBreakdown = calculateOrderFees({ ...order, lateFee: effectiveLateFee });
 
       return {
         id: order.id,
@@ -89,7 +95,9 @@ export async function GET(request: Request) {
         endDate: endDate.toISOString(),
         actualPickup: order.actualPickup ? order.actualPickup.toISOString() : null,
         actualReturn: order.actualReturn ? order.actualReturn.toISOString() : null,
-        lateFee: order.lateFee || 0,
+        lateFee: effectiveLateFee,
+        lateFeePerDay: late.dailyRate,
+        daysLate: late.daysLate,
         extensionFee: order.extensionFee || 0,
         damageFee: order.damageFee || 0,
         lossFee: order.lossFee || 0,
