@@ -39,8 +39,11 @@ export default function ProcessCancelModal({
   useEffect(() => {
     if (rental) {
       const cancelReq = rental.cancelRequest;
+      const paid = rental.paymentStatus === "CONFIRMED";
       setRefundAmount(
-        cancelReq?.refundAmount !== undefined && cancelReq?.refundAmount !== null
+        !paid
+          ? 0
+          : cancelReq?.refundAmount !== undefined && cancelReq?.refundAmount !== null
           ? Number(cancelReq.refundAmount)
           : rental.totalAmount || 0
       );
@@ -59,6 +62,8 @@ export default function ProcessCancelModal({
   const cancelReq = rental.cancelRequest;
   const isPending = cancelReq?.status === "PENDING_ACC";
   const isAlreadyApproved = cancelReq?.status === "APPROVED" || rental.status === "CANCELLED";
+  // Refund hanya relevan bila pembayaran pelanggan sudah dikonfirmasi admin.
+  const isPaid = rental.paymentStatus === "CONFIRMED";
 
   const formatIDR = (n: number) => "Rp " + (n || 0).toLocaleString("id-ID");
 
@@ -71,18 +76,21 @@ export default function ProcessCancelModal({
 
   const handleApprove = async () => {
     setErrorMsg("");
-    if (!bankInfo.trim()) {
-      setErrorMsg("Mohon pastikan informasi nomor rekening & bank penerima refund terisi.");
-      return;
-    }
-    if (refundAmount < 0) {
-      setErrorMsg("Nominal refund tidak boleh kurang dari 0.");
-      return;
+    // Validasi detail refund hanya diperlukan bila memang ada dana yang dikembalikan.
+    if (isPaid) {
+      if (!bankInfo.trim()) {
+        setErrorMsg("Mohon pastikan informasi nomor rekening & bank penerima refund terisi.");
+        return;
+      }
+      if (refundAmount < 0) {
+        setErrorMsg("Nominal refund tidak boleh kurang dari 0.");
+        return;
+      }
     }
 
     await onConfirm(rental.id, "ACC_CANCEL", {
-      refundAmount: Number(refundAmount),
-      bankInfo: bankInfo.trim(),
+      refundAmount: isPaid ? Number(refundAmount) : 0,
+      bankInfo: isPaid ? bankInfo.trim() : "",
       whatsapp: whatsapp.trim(),
       reason: reason.trim(),
       adminNotes: adminNotes.trim(),
@@ -292,37 +300,50 @@ export default function ProcessCancelModal({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Nominal Refund (Rp) *
-                      </label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={rental.totalAmount}
-                        value={refundAmount}
-                        onChange={(e) => setRefundAmount(Number(e.target.value))}
-                        className="input-modern text-xs py-2 font-mono font-bold"
-                      />
-                      <span className="text-[10px] text-slate-400 mt-0.5 block">
-                        Default 100%: {formatIDR(rental.totalAmount)}
-                      </span>
-                    </div>
+                  {isPaid ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                          Nominal Refund (Rp) *
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={rental.totalAmount}
+                          value={refundAmount}
+                          onChange={(e) => setRefundAmount(Number(e.target.value))}
+                          className="input-modern text-xs py-2 font-mono font-bold"
+                        />
+                        <span className="text-[10px] text-slate-400 mt-0.5 block">
+                          Default 100%: {formatIDR(rental.totalAmount)}
+                        </span>
+                      </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        No. Rekening &amp; Bank Refund *
-                      </label>
-                      <input
-                        type="text"
-                        value={bankInfo}
-                        onChange={(e) => setBankInfo(e.target.value)}
-                        placeholder="Contoh: BCA 12345678 a.n John"
-                        className="input-modern text-xs py-2 font-mono"
-                      />
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                          No. Rekening &amp; Bank Refund *
+                        </label>
+                        <input
+                          type="text"
+                          value={bankInfo}
+                          onChange={(e) => setBankInfo(e.target.value)}
+                          placeholder="Contoh: BCA 12345678 a.n John"
+                          className="input-modern text-xs py-2 font-mono"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 space-y-1">
+                      <span className="font-bold flex items-center gap-1">
+                        ℹ️ Belum Ada Pembayaran Terkonfirmasi
+                      </span>
+                      <p className="text-[11px] leading-relaxed text-amber-700">
+                        Pelanggan belum melakukan pembayaran atau bukti transfer belum
+                        diverifikasi admin. Pesanan akan dibatalkan{" "}
+                        <strong>tanpa refund</strong> karena tidak ada dana yang masuk.
+                      </p>
+                    </div>
+                  )}
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
@@ -393,6 +414,8 @@ export default function ProcessCancelModal({
                 <span>
                   {loadingAction
                     ? "Memproses..."
+                    : !isPaid
+                    ? "Batalkan Pesanan (Tanpa Refund)"
                     : isPending
                     ? "Setujui Pembatalan & Catat Refund"
                     : "Batalkan & Catat Refund"}

@@ -254,17 +254,39 @@ export async function PUT(
         }
         parsedNotes.cancelRequest.status = "APPROVED";
         parsedNotes.cancelRequest.approvedAt = new Date().toISOString();
-        if (body.refundAmount !== undefined) parsedNotes.cancelRequest.refundAmount = Number(body.refundAmount);
         if (body.adminNotes) parsedNotes.cancelRequest.adminNotes = body.adminNotes;
         if (body.reason && !parsedNotes.cancelRequest.reason) parsedNotes.cancelRequest.reason = body.reason;
-        if (body.bankInfo && !parsedNotes.cancelRequest.bankInfo) parsedNotes.cancelRequest.bankInfo = body.bankInfo;
         if (body.whatsapp && !parsedNotes.cancelRequest.whatsapp) parsedNotes.cancelRequest.whatsapp = body.whatsapp;
-        updateData.notes = JSON.stringify(parsedNotes);
 
-        await prisma.payment.updateMany({
-          where: { orderId: order.id },
-          data: { status: "REFUNDED" },
-        });
+        // Refund hanya boleh jika ada pembayaran yang SUDAH dikonfirmasi admin.
+        // Bila pelanggan belum membayar / bukti transfer belum diverifikasi, pembatalan
+        // tetap diproses TETAPI tanpa pencatatan refund (tidak ada dana yang masuk).
+        const hasConfirmedPayment = (order.payments || []).some((p) => p.status === "CONFIRMED");
+
+        if (hasConfirmedPayment) {
+          if (body.refundAmount !== undefined) parsedNotes.cancelRequest.refundAmount = Number(body.refundAmount);
+          if (body.bankInfo && !parsedNotes.cancelRequest.bankInfo) parsedNotes.cancelRequest.bankInfo = body.bankInfo;
+          parsedNotes.cancelRequest.refunded = true;
+
+          // Tandai hanya pembayaran yang terkonfirmasi sebagai REFUNDED.
+          await prisma.payment.updateMany({
+            where: { orderId: order.id, status: "CONFIRMED" },
+            data: { status: "REFUNDED" },
+          });
+        } else {
+          parsedNotes.cancelRequest.refundAmount = 0;
+          parsedNotes.cancelRequest.refunded = false;
+          parsedNotes.cancelRequest.noRefundReason =
+            "Pesanan dibatalkan sebelum pembayaran dikonfirmasi — tidak ada dana yang perlu dikembalikan.";
+
+          // Batalkan upaya pembayaran yang belum diverifikasi agar pembukuan tetap bersih.
+          await prisma.payment.updateMany({
+            where: { orderId: order.id, status: "PENDING" },
+            data: { status: "REJECTED" },
+          });
+        }
+
+        updateData.notes = JSON.stringify(parsedNotes);
       } else if (action === "REJECT_CANCEL") {
         if (parsedNotes.cancelRequest) {
           parsedNotes.cancelRequest.status = "REJECTED";
@@ -354,11 +376,34 @@ export async function PUT(
         }
         parsedNotes.cancelRequest.status = "APPROVED";
         parsedNotes.cancelRequest.approvedAt = new Date().toISOString();
-        if (body.refundAmount !== undefined) parsedNotes.cancelRequest.refundAmount = Number(body.refundAmount);
         if (body.adminNotes) parsedNotes.cancelRequest.adminNotes = body.adminNotes;
         if (body.reason && !parsedNotes.cancelRequest.reason) parsedNotes.cancelRequest.reason = body.reason;
-        if (body.bankInfo && !parsedNotes.cancelRequest.bankInfo) parsedNotes.cancelRequest.bankInfo = body.bankInfo;
         if (body.whatsapp && !parsedNotes.cancelRequest.whatsapp) parsedNotes.cancelRequest.whatsapp = body.whatsapp;
+
+        // Refund hanya untuk booking yang pembayarannya sudah dikonfirmasi admin.
+        const confirmedCount = await prisma.payment.count({
+          where: { bookingId: booking.id, status: "CONFIRMED" },
+        });
+
+        if (confirmedCount > 0) {
+          if (body.refundAmount !== undefined) parsedNotes.cancelRequest.refundAmount = Number(body.refundAmount);
+          if (body.bankInfo && !parsedNotes.cancelRequest.bankInfo) parsedNotes.cancelRequest.bankInfo = body.bankInfo;
+          parsedNotes.cancelRequest.refunded = true;
+          await prisma.payment.updateMany({
+            where: { bookingId: booking.id, status: "CONFIRMED" },
+            data: { status: "REFUNDED" },
+          });
+        } else {
+          parsedNotes.cancelRequest.refundAmount = 0;
+          parsedNotes.cancelRequest.refunded = false;
+          parsedNotes.cancelRequest.noRefundReason =
+            "Booking dibatalkan sebelum pembayaran dikonfirmasi — tidak ada dana yang perlu dikembalikan.";
+          await prisma.payment.updateMany({
+            where: { bookingId: booking.id, status: "PENDING" },
+            data: { status: "REJECTED" },
+          });
+        }
+
         updateData.notes = JSON.stringify(parsedNotes);
       } else if (action === "REJECT_CANCEL") {
         if (parsedNotes.cancelRequest) {

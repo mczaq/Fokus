@@ -241,6 +241,16 @@ export default function RentalMonitoringPage() {
     }
   };
 
+  // Pembatalan untuk pesanan yang BELUM dibayar (pembayaran belum dikonfirmasi admin).
+  // Tidak membuka form refund karena tidak ada dana yang perlu dikembalikan.
+  const handleCancelNoRefund = async (rentalId: string) => {
+    const ok = window.confirm(
+      "Batalkan pesanan ini?\n\nPembayaran belum dikonfirmasi, sehingga TIDAK ada dana yang direfund. Pesanan hanya akan ditandai sebagai dibatalkan."
+    );
+    if (!ok) return;
+    await handleAction(rentalId, "ACC_CANCEL");
+  };
+
   const [categoryTab, setCategoryTab] = useState<"ALL" | "EQUIPMENT" | "STUDIO" | "SERVICE">("ALL");
 
   const handleApproveExtend = async (rentalId: string, status: string) => {
@@ -492,6 +502,13 @@ export default function RentalMonitoringPage() {
               <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                 {filteredRentals.map((record) => {
                   const isUpdating = updatingId === record.id;
+                  // Pembayaran dianggap lunas & bisa direfund hanya jika sudah dikonfirmasi admin.
+                  const isPaid = record.paymentStatus === "CONFIRMED";
+                  // Apakah pembatalan ini benar-benar disertai refund (ada dana yang kembali)?
+                  const wasRefunded =
+                    Boolean(record.cancelRequest?.refunded) ||
+                    Number(record.cancelRequest?.refundAmount || 0) > 0;
+                  const cancelledLabel = wasRefunded ? "Dibatalkan & Direfund" : "Dibatalkan";
 
                   return (
                     <tr key={`${record.type}-${record.id}`} className="hover:bg-slate-50/50 transition-colors">
@@ -626,7 +643,7 @@ export default function RentalMonitoringPage() {
                                 ? "Menunggu Bayar"
                                 : record.status === "COMPLETED"
                                 ? "Selesai Digunakan"
-                                : "Dibatalkan & Direfund"
+                                : cancelledLabel
                               : record.type === "SERVICE"
                               ? record.status === "CONFIRMED" || record.status === "PROCESSING"
                                 ? "Dijadwalkan"
@@ -649,7 +666,7 @@ export default function RentalMonitoringPage() {
                               ? "Menunggu Bayar"
                               : record.status === "COMPLETED"
                               ? "Sudah Dikembalikan"
-                              : "Dibatalkan & Direfund"}
+                              : cancelledLabel}
                           </span>
                           <p className="text-slate-400 text-[10px] font-mono block">
                             Total: {formatIDR(record.totalAmount)}
@@ -789,13 +806,13 @@ export default function RentalMonitoringPage() {
                         ) : record.status === "CANCELLED" ? (
                           <div className="flex flex-col items-end gap-1">
                             <span className="text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                              ✓ Dibatalkan &amp; Direfund
+                              ✓ {wasRefunded ? "Dibatalkan & Direfund" : "Dibatalkan (Tanpa Refund)"}
                             </span>
                             <button
                               onClick={() => setProcessCancelRental(record)}
                               className="text-slate-500 hover:text-slate-800 text-[10px] underline font-medium cursor-pointer"
                             >
-                              🔍 Detail Refund
+                              🔍 {wasRefunded ? "Detail Refund" : "Detail Pembatalan"}
                             </button>
                           </div>
                         ) : record.type === "STUDIO" ? (
@@ -822,13 +839,24 @@ export default function RentalMonitoringPage() {
                             )}
 
                             {(record.status === "PROCESSING" || record.status === "ACTIVE" || record.status === "PENDING") && (
-                              <button
-                                disabled={isUpdating}
-                                onClick={() => setProcessCancelRental(record)}
-                                className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
-                              >
-                                ⚠️ Batalkan &amp; Refund Studio
-                              </button>
+                              isPaid ? (
+                                <button
+                                  disabled={isUpdating}
+                                  onClick={() => setProcessCancelRental(record)}
+                                  className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                                >
+                                  ⚠️ Batalkan &amp; Refund Studio
+                                </button>
+                              ) : (
+                                <button
+                                  disabled={isUpdating}
+                                  onClick={() => handleCancelNoRefund(record.id)}
+                                  className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-slate-600 hover:bg-slate-100 border border-slate-300 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                                  title="Pembayaran belum dikonfirmasi — pembatalan tanpa refund"
+                                >
+                                  ✕ Batalkan Booking
+                                </button>
+                              )
                             )}
 
                             {record.status === "COMPLETED" && (
@@ -871,13 +899,24 @@ export default function RentalMonitoringPage() {
                             )}
 
                             {(record.status === "PENDING" || record.status === "CONFIRMED" || record.status === "PROCESSING" || record.status === "ACTIVE") && (
-                              <button
-                                disabled={isUpdating}
-                                onClick={() => setProcessCancelRental(record)}
-                                className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
-                              >
-                                ⚠️ Batalkan & Refund
-                              </button>
+                              isPaid ? (
+                                <button
+                                  disabled={isUpdating}
+                                  onClick={() => setProcessCancelRental(record)}
+                                  className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                                >
+                                  ⚠️ Batalkan & Refund
+                                </button>
+                              ) : (
+                                <button
+                                  disabled={isUpdating}
+                                  onClick={() => handleCancelNoRefund(record.id)}
+                                  className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-slate-600 hover:bg-slate-100 border border-slate-300 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                                  title="Pembayaran belum dikonfirmasi — pembatalan tanpa refund"
+                                >
+                                  ✕ Batalkan Order
+                                </button>
+                              )
                             )}
 
                             {record.status === "COMPLETED" && (
@@ -932,13 +971,24 @@ export default function RentalMonitoringPage() {
                             )}
 
                             {(record.status === "PROCESSING" || record.status === "PENDING") && (
-                              <button
-                                disabled={isUpdating}
-                                onClick={() => setProcessCancelRental(record)}
-                                className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
-                              >
-                                Batalkan &amp; Refund
-                              </button>
+                              isPaid ? (
+                                <button
+                                  disabled={isUpdating}
+                                  onClick={() => setProcessCancelRental(record)}
+                                  className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                                >
+                                  Batalkan &amp; Refund
+                                </button>
+                              ) : (
+                                <button
+                                  disabled={isUpdating}
+                                  onClick={() => handleCancelNoRefund(record.id)}
+                                  className="block w-full sm:w-auto ml-auto px-2.5 py-1 text-slate-600 hover:bg-slate-100 border border-slate-300 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                                  title="Pembayaran belum dikonfirmasi — pembatalan tanpa refund"
+                                >
+                                  ✕ Batalkan Pesanan
+                                </button>
+                              )
                             )}
 
                             {record.status === "COMPLETED" && (

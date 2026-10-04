@@ -43,6 +43,17 @@ export async function GET(request: Request) {
 
     const now = new Date();
 
+    // Ringkas status pembayaran dari seluruh riwayat payment sebuah order.
+    // Dipakai admin untuk menentukan apakah refund boleh dilakukan:
+    // refund hanya sah bila ada pembayaran yang SUDAH dikonfirmasi admin (CONFIRMED).
+    const derivePaymentStatus = (payments: { status: string }[] = []) => {
+      if (payments.some((p) => p.status === "CONFIRMED")) return "CONFIRMED";
+      if (payments.some((p) => p.status === "REFUNDED")) return "REFUNDED";
+      if (payments.some((p) => p.status === "PENDING")) return "PENDING";
+      if (payments.some((p) => p.status === "REJECTED")) return "REJECTED";
+      return "NONE";
+    };
+
     const mappedRentals = orders.map((order) => {
       const startDate = order.startDate ? new Date(order.startDate) : order.createdAt;
       const endDate = order.endDate
@@ -131,7 +142,7 @@ export async function GET(request: Request) {
               }
             : null,
         })),
-        paymentStatus: order.payments[0]?.status || "PENDING",
+        paymentStatus: derivePaymentStatus(order.payments),
         paymentMethod: order.payments[0]?.method || "—",
         studio: null,
         isOverdue,
@@ -227,7 +238,15 @@ export async function GET(request: Request) {
             },
           },
         ],
-        paymentStatus: sb.status === "CANCELLED" ? "CANCELLED" : "CONFIRMED",
+        // Booking baru dianggap "terbayar" (CONFIRMED) setelah admin memverifikasi
+        // pembayaran — yang menaikkan status dari PENDING ke CONFIRMED/IN_USE/COMPLETED.
+        // Saat masih PENDING berarti pembayaran belum dikonfirmasi → belum ada yang bisa direfund.
+        paymentStatus:
+          sb.status === "CANCELLED"
+            ? "CANCELLED"
+            : sb.status === "PENDING"
+            ? "PENDING"
+            : "CONFIRMED",
         paymentMethod: "VA / QRIS",
         isOverdue,
         diffDays: 0,
@@ -265,7 +284,6 @@ export async function GET(request: Request) {
         },
         payments: {
           orderBy: { createdAt: "desc" },
-          take: 1,
         },
       },
     });
@@ -339,7 +357,7 @@ export async function GET(request: Request) {
               }
             : null,
         })),
-        paymentStatus: order.payments[0]?.status || "PENDING",
+        paymentStatus: derivePaymentStatus(order.payments),
         paymentMethod: order.payments[0]?.method || "—",
         studio: null,
         isOverdue: false,
