@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { calculateOrderFees } from "@/app/lib/feeHelper";
+import { computeLateFee } from "@/app/lib/lateFee";
 
 export async function POST(
   request: Request,
@@ -60,26 +61,31 @@ export async function POST(
       return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 });
     }
 
-    const feeBreakdown = calculateOrderFees(order);
+    // Sertakan denda keterlambatan berjalan (hari telat × tarif harian) walau
+    // belum difinalisasi admin, sehingga pelanggan bisa melunasinya dari sini.
+    const late = computeLateFee(order);
+    const effectiveLateFee = late.isLate ? late.lateFee : order.lateFee || 0;
+
+    const feeBreakdown = calculateOrderFees({ ...order, lateFee: effectiveLateFee });
     const amountToPay = feeBreakdown.unpaidTotalFee;
 
     if (amountToPay <= 0) {
       return NextResponse.json({ error: "Tidak ada denda atau biaya tambahan yang perlu dibayar." }, { status: 400 });
     }
 
-    // Record Payment with the exact unpaid amount
+    // Catat pembayaran denda sebagai PENDING — WAJIB diverifikasi/disetujui admin
+    // terlebih dahulu sebelum dianggap lunas (dan sebelum pengembalian diinspeksi).
     await prisma.payment.create({
       data: {
         amount: amountToPay,
         method: paymentMethod || "TRANSFER",
-        status: "CONFIRMED",
+        status: "PENDING",
         proofImage: proofImage || null,
-        confirmedAt: new Date(),
         orderId: order.id,
       },
     });
 
-    // Update notes to track that these fees have been settled
+    // Update notes to track the fee awaiting verification
     let parsedNotes: any = {};
     if (order.notes) {
       try {
@@ -93,26 +99,30 @@ export async function POST(
       }
     }
 
-    parsedNotes.paidFeeDetails = {
-      lateFee: order.lateFee || 0,
+    // Snapshot rincian denda yang dibayar, dipakai admin saat menyetujui.
+    parsedNotes.pendingFee = {
+      amount: amountToPay,
+      lateFee: effectiveLateFee,
       extensionFee: order.extensionFee || 0,
       damageFee: order.damageFee || 0,
       lossFee: order.lossFee || 0,
+      submittedAt: new Date().toISOString(),
     };
 
-    // Update fee status and totalAmount
+    // feeStatus → PENDING_VERIFICATION, dan denda keterlambatan dibekukan (lateFee
+    // dipersistkan) agar nilainya tidak bertambah selama menunggu persetujuan.
     const updatedOrder = await prisma.order.update({
       where: { id: order.id },
       data: {
-        feeStatus: "PAID",
-        totalAmount: order.totalAmount + amountToPay,
+        feeStatus: "PENDING_VERIFICATION",
+        lateFee: effectiveLateFee,
         notes: JSON.stringify(parsedNotes),
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Pembayaran denda / biaya tambahan berhasil dikonfirmasi.",
+      message: "Pembayaran denda terkirim dan menunggu persetujuan admin.",
       order: updatedOrder,
       paidAmount: amountToPay,
     });

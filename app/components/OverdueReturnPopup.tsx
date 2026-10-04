@@ -1,44 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { AlertTriangle, X } from "lucide-react";
 import { useNotifications } from "../context/NotificationContext";
-
-const DISMISS_KEY = "fokus_overdue_dismissed";
 
 export default function OverdueReturnPopup() {
   const { notifications } = useNotifications();
   const router = useRouter();
-  const [dismissed, setDismissed] = useState(true);
+  const pathname = usePathname();
+  const [dismissed, setDismissed] = useState(false);
 
   const lateNotifs = notifications.filter((n) => n.type === "LATE_RETURN");
-  // Tanda tangan kumpulan keterlambatan saat ini. Jika berubah (mis. ada barang
-  // telat baru), pop-up muncul lagi meski sebelumnya sudah ditutup.
   const signature = lateNotifs.map((n) => n.id).sort().join("|");
 
+  // Pop-up SELALU muncul lagi setiap kali pelanggan berpindah halaman
+  // (pathname berubah) atau saat daftar keterlambatan berubah. Refresh halaman
+  // otomatis me-reset state ini sehingga pop-up kembali tampil.
   useEffect(() => {
-    if (!signature) {
-      setDismissed(true);
-      return;
-    }
-    try {
-      setDismissed(sessionStorage.getItem(DISMISS_KEY) === signature);
-    } catch {
-      setDismissed(false);
-    }
-  }, [signature]);
+    setDismissed(false);
+  }, [pathname, signature]);
 
   if (!signature || dismissed || lateNotifs.length === 0) return null;
 
-  const close = () => {
-    try {
-      sessionStorage.setItem(DISMISS_KEY, signature);
-    } catch {
-      /* abaikan */
-    }
-    setDismissed(true);
-  };
+  // Menutup hanya menyembunyikan untuk tampilan halaman saat ini; begitu pindah
+  // halaman atau refresh, pop-up akan muncul kembali.
+  const close = () => setDismissed(true);
 
   const goToOrders = () => {
     close();

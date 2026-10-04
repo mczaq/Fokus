@@ -155,9 +155,10 @@ export async function GET(request: Request) {
         });
       }
 
-      // Keterlambatan pengembalian (hanya equipment yang belum dikembalikan)
+      // Keterlambatan pengembalian (hanya equipment yang belum dikembalikan &
+      // dendanya belum dilunasi).
       const late = computeLateFee(o, now);
-      if (late.isLate) {
+      if (late.isLate && String(o.feeStatus || "").toUpperCase() !== "PAID") {
         notifs.push({
           id: `late-${o.id}`,
           type: "LATE_RETURN",

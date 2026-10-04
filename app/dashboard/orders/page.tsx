@@ -237,8 +237,9 @@ export default function OrdersPage() {
                               </span>
                             )}
 
-                            {/* Denda keterlambatan berjalan (barang belum dikembalikan & lewat jatuh tempo) */}
-                            {o.isOverdue && (
+                            {/* Denda keterlambatan berjalan (barang belum dikembalikan,
+                                lewat jatuh tempo, & denda belum dibayar/diverifikasi) */}
+                            {o.isOverdue && o.feeStatus !== "PAID" && o.feeStatus !== "PENDING_VERIFICATION" && (
                               <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border border-rose-300 bg-rose-50 text-rose-700 animate-pulse">
                                 🔴 Terlambat {o.daysLate || 1} hari — Denda berjalan Rp {Number(o.lateFee || 0).toLocaleString("id-ID")}
                               </span>
@@ -437,8 +438,11 @@ export default function OrdersPage() {
                                 </button>
                               )}
 
-                              {/* Pay Fee / Denda Button */}
-                              {o.feeStatus === "UNPAID" && (
+                              {/* Pay Fee / Denda Button — tampil untuk denda yang sudah
+                                  difinalisasi (UNPAID) maupun denda keterlambatan yang
+                                  masih berjalan (unpaidTotalFee > 0). */}
+                              {(o.feeStatus === "UNPAID" || (o.unpaidTotalFee || 0) > 0) &&
+                                o.feeStatus !== "PENDING_VERIFICATION" && (
                                 <button
                                   onClick={() => {
                                     setPayFeeModalOrder(o);

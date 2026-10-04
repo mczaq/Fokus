@@ -49,48 +49,98 @@ export async function PATCH(
     });
 
     // Cascade to the related order
-    if (payment.orderId) {
-      const orderStatus =
-        newStatus === "CONFIRMED" ? "PROCESSING" :
-        newStatus === "REFUNDED" ? "CANCELLED" :
-        "PENDING"; // REJECTED -> back to awaiting payment
+    if (payment.orderId && payment.order) {
+      const ord = payment.order;
+      // Bedakan pembayaran DENDA/biaya tambahan dari pembayaran POKOK:
+      // pembayaran pokok hanya ada saat order masih PENDING. Jika order sudah
+      // melewati PENDING (ACTIVE/OVERDUE/PROCESSING/COMPLETED), ini pembayaran denda.
+      const isFeePayment = ord.status !== "PENDING";
 
-      await prisma.order.update({
-        where: { id: payment.orderId },
-        data: {
-          status: orderStatus,
-          ...(newStatus === "CONFIRMED" ? { agreementAccepted: true } : {}),
-        },
-      });
-
-      try {
-        await syncEquipmentStock();
-      } catch (e) {
-        console.error("Stock sync after payment verification failed:", e);
-      }
-
-      if (newStatus === "CONFIRMED" && payment.order) {
+      if (isFeePayment) {
+        let parsed: any = {};
         try {
-          const user = await prisma.user.findUnique({
-            where: { id: payment.order.userId },
-            select: { email: true },
+          if (ord.notes && ord.notes.trim().startsWith("{")) parsed = JSON.parse(ord.notes);
+          else if (ord.notes) parsed = { userNotes: ord.notes };
+        } catch {
+          parsed = {};
+        }
+        const pendingFee = parsed.pendingFee || {};
+
+        if (newStatus === "CONFIRMED") {
+          // Denda disetujui → tandai LUNAS & finalkan nilainya. Status order TIDAK diubah.
+          parsed.paidFeeDetails = {
+            lateFee: Number(pendingFee.lateFee ?? ord.lateFee ?? 0),
+            extensionFee: Number(pendingFee.extensionFee ?? ord.extensionFee ?? 0),
+            damageFee: Number(pendingFee.damageFee ?? ord.damageFee ?? 0),
+            lossFee: Number(pendingFee.lossFee ?? ord.lossFee ?? 0),
+          };
+          delete parsed.pendingFee;
+          await prisma.order.update({
+            where: { id: ord.id },
+            data: {
+              feeStatus: "PAID",
+              lateFee: Number(pendingFee.lateFee ?? ord.lateFee ?? 0),
+              totalAmount: ord.totalAmount + payment.amount,
+              notes: JSON.stringify(parsed),
+            },
           });
-          if (user?.email) {
-            const fullOrder = await prisma.order.findUnique({
-              where: { id: payment.orderId },
-              include: {
-                items: {
-                  include: {
-                    equipment: { select: { name: true } },
-                    service: { select: { name: true } },
+        } else if (newStatus === "REJECTED") {
+          // Denda ditolak → pelanggan harus bayar ulang (denda keterlambatan berjalan lagi).
+          delete parsed.pendingFee;
+          await prisma.order.update({
+            where: { id: ord.id },
+            data: { feeStatus: "UNPAID", notes: JSON.stringify(parsed) },
+          });
+        } else if (newStatus === "REFUNDED") {
+          await prisma.order.update({
+            where: { id: ord.id },
+            data: { feeStatus: "UNPAID" },
+          });
+        }
+      } else {
+        // Pembayaran POKOK (order masih menunggu pembayaran) — perilaku lama.
+        const orderStatus =
+          newStatus === "CONFIRMED" ? "PROCESSING" :
+          newStatus === "REFUNDED" ? "CANCELLED" :
+          "PENDING"; // REJECTED -> back to awaiting payment
+
+        await prisma.order.update({
+          where: { id: ord.id },
+          data: {
+            status: orderStatus,
+            ...(newStatus === "CONFIRMED" ? { agreementAccepted: true } : {}),
+          },
+        });
+
+        try {
+          await syncEquipmentStock();
+        } catch (e) {
+          console.error("Stock sync after payment verification failed:", e);
+        }
+
+        if (newStatus === "CONFIRMED") {
+          try {
+            const user = await prisma.user.findUnique({
+              where: { id: ord.userId },
+              select: { email: true },
+            });
+            if (user?.email) {
+              const fullOrder = await prisma.order.findUnique({
+                where: { id: ord.id },
+                include: {
+                  items: {
+                    include: {
+                      equipment: { select: { name: true } },
+                      service: { select: { name: true } },
+                    },
                   },
                 },
-              },
-            });
-            await sendOrderNotificationEmail(fullOrder, user.email);
+              });
+              await sendOrderNotificationEmail(fullOrder, user.email);
+            }
+          } catch (e) {
+            console.error("Verification email (order) failed:", e);
           }
-        } catch (e) {
-          console.error("Verification email (order) failed:", e);
         }
       }
     }

@@ -66,7 +66,9 @@ export async function GET(
       }
 
       const late = computeLateFee(order);
-      const effectiveLateFee = late.isLate ? late.lateFee : order.lateFee || 0;
+      const _fs = String(order.feeStatus || "").toUpperCase();
+      const lateFeeSettled = _fs === "PAID" || _fs === "PENDING_VERIFICATION";
+      const effectiveLateFee = late.isLate && !lateFeeSettled ? late.lateFee : order.lateFee || 0;
       const feeBreakdown = calculateOrderFees({ ...order, lateFee: effectiveLateFee });
 
       return NextResponse.json({
@@ -237,21 +239,36 @@ export async function PUT(
         if (!parsedNotes.paidFeeDetails) {
           parsedNotes.paidFeeDetails = {};
         }
-        // If extensionFee was already paid prior to this return inspection, preserve it
+        // Pertahankan biaya yang sudah dibayar pelanggan sebelum inspeksi:
+        // biaya perpanjangan, maupun denda keterlambatan yang dilunasi saat masih menyewa.
         const currentFees = calculateOrderFees(order);
         if (currentFees.paidExtensionFee > 0) {
           parsedNotes.paidFeeDetails.extensionFee = currentFees.paidExtensionFee;
         } else if (order.extensionFee > 0 && order.feeStatus === "PAID") {
           parsedNotes.paidFeeDetails.extensionFee = order.extensionFee;
         }
+        if (currentFees.paidLateFee > 0) {
+          parsedNotes.paidFeeDetails.lateFee = currentFees.paidLateFee;
+        } else if (order.lateFee > 0 && order.feeStatus === "PAID") {
+          parsedNotes.paidFeeDetails.lateFee = order.lateFee;
+        }
         updateData.notes = JSON.stringify(parsedNotes);
 
-        const totalFees = updateData.damageFee + updateData.lossFee + updateData.lateFee;
-        if (totalFees > 0) {
+        // feeStatus ditentukan dari sisa biaya yang BELUM dibayar
+        // (memperhitungkan denda keterlambatan/perpanjangan yang sudah dilunasi).
+        const paidDetails = parsedNotes.paidFeeDetails;
+        const unpaidLate = Math.max(0, updateData.lateFee - Number(paidDetails.lateFee || 0));
+        const unpaidDamage = Math.max(0, updateData.damageFee - Number(paidDetails.damageFee || 0));
+        const unpaidLoss = Math.max(0, updateData.lossFee - Number(paidDetails.lossFee || 0));
+        const unpaidExtension = Math.max(0, (order.extensionFee || 0) - Number(paidDetails.extensionFee || 0));
+        const totalUnpaid = unpaidLate + unpaidDamage + unpaidLoss + unpaidExtension;
+        const totalAssessed =
+          updateData.damageFee + updateData.lossFee + updateData.lateFee + (order.extensionFee || 0);
+
+        if (totalUnpaid > 0) {
           updateData.feeStatus = "UNPAID";
         } else {
-          const isExtensionPaid = (parsedNotes.paidFeeDetails.extensionFee || 0) >= (order.extensionFee || 0);
-          updateData.feeStatus = isExtensionPaid ? (order.extensionFee > 0 ? "PAID" : "NONE") : "UNPAID";
+          updateData.feeStatus = totalAssessed > 0 ? "PAID" : "NONE";
         }
         updateData.status = "COMPLETED";
       } else if (action === "ACC_CANCEL") {

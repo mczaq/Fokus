@@ -82,9 +82,16 @@ export async function GET(request: Request) {
       // Denda keterlambatan otomatis: selama barang belum dikembalikan dan sudah
       // lewat jatuh tempo, denda dihitung berjalan (hari telat × tarif harian item).
       const late = computeLateFee({ ...order, endDate }, now);
-      const effectiveLateFee = late.isLate ? late.lateFee : order.lateFee || 0;
+      // Dibekukan setelah denda dibayar (menunggu verifikasi) atau disetujui (PAID).
+      const _fs = String(order.feeStatus || "").toUpperCase();
+      const lateFeeSettled = _fs === "PAID" || _fs === "PENDING_VERIFICATION";
+      const effectiveLateFee = late.isLate && !lateFeeSettled ? late.lateFee : order.lateFee || 0;
 
       const feeBreakdown = calculateOrderFees({ ...order, lateFee: effectiveLateFee });
+
+      // Pembayaran denda yang menunggu persetujuan admin (status PENDING pada order
+      // yang sudah tidak PENDING lagi = pembayaran denda, bukan pokok).
+      const pendingFeePay = (order.payments || []).find((p: any) => p.status === "PENDING");
 
       return {
         id: order.id,
@@ -98,6 +105,9 @@ export async function GET(request: Request) {
         lateFee: effectiveLateFee,
         lateFeePerDay: late.dailyRate,
         daysLate: late.daysLate,
+        pendingFeePayment: pendingFeePay
+          ? { id: pendingFeePay.id, amount: pendingFeePay.amount, proofImage: pendingFeePay.proofImage || null }
+          : null,
         extensionFee: order.extensionFee || 0,
         damageFee: order.damageFee || 0,
         lossFee: order.lossFee || 0,

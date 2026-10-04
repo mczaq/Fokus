@@ -57,10 +57,13 @@ interface RentalRecord {
   status: "PENDING" | "CONFIRMED" | "PROCESSING" | "ACTIVE" | "OVERDUE" | "COMPLETED" | "CANCELLED";
   totalAmount: number;
   lateFee?: number;
+  lateFeePerDay?: number;
+  daysLate?: number;
   extensionFee?: number;
   damageFee?: number;
   lossFee?: number;
   feeStatus?: string;
+  pendingFeePayment?: { id: string; amount: number; proofImage?: string | null } | null;
   unpaidLateFee?: number;
   unpaidExtensionFee?: number;
   unpaidDamageFee?: number;
@@ -252,6 +255,33 @@ export default function RentalMonitoringPage() {
   };
 
   const [categoryTab, setCategoryTab] = useState<"ALL" | "EQUIPMENT" | "STUDIO" | "SERVICE">("ALL");
+
+  // Verifikasi pembayaran denda keterlambatan oleh admin (setujui / tolak).
+  // Memanggil endpoint pembayaran yang sudah "fee-aware" (tidak mengubah status order).
+  const handleVerifyFee = async (
+    rentalId: string,
+    paymentId: string,
+    action: "ACCEPT" | "REJECT"
+  ) => {
+    try {
+      setUpdatingId(rentalId);
+      const res = await fetch(`/api/payments/${paymentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (res.ok) {
+        await fetchRentals();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Gagal memproses verifikasi pembayaran denda.");
+      }
+    } catch (e) {
+      console.error("Error verifying fee payment:", e);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const handleApproveExtend = async (rentalId: string, status: string) => {
     try {
@@ -940,13 +970,67 @@ export default function RentalMonitoringPage() {
 
                             {(record.status === "ACTIVE" || record.status === "OVERDUE") && (
                               <div className="space-y-1 mt-1">
-                                <button
-                                  disabled={isUpdating}
-                                  onClick={() => setInspectionRental(record)}
-                                  className="w-full sm:w-auto px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
-                                >
-                                  ✅ Terima Pengembalian &amp; Inspeksi
-                                </button>
+                                {record.isOverdue && record.feeStatus !== "PAID" ? (
+                                  record.feeStatus === "PENDING_VERIFICATION" ? (
+                                    /* Denda sudah dibayar pelanggan → admin verifikasi dulu */
+                                    <div className="space-y-1 w-full sm:w-auto ml-auto">
+                                      <div className="px-2 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-[10px] font-bold text-amber-800 text-right">
+                                        💳 Denda dibayar pelanggan
+                                        {record.pendingFeePayment
+                                          ? ` (Rp ${Number(record.pendingFeePayment.amount).toLocaleString("id-ID")})`
+                                          : ""}
+                                        <br />menunggu persetujuan Anda
+                                      </div>
+                                      {record.pendingFeePayment?.proofImage && (
+                                        <a
+                                          href={record.pendingFeePayment.proofImage}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="block text-[10px] text-blue-600 hover:underline text-right"
+                                        >
+                                          🧾 Lihat bukti transfer
+                                        </a>
+                                      )}
+                                      <div className="flex items-center justify-end gap-1.5">
+                                        <button
+                                          disabled={isUpdating || !record.pendingFeePayment}
+                                          onClick={() =>
+                                            record.pendingFeePayment &&
+                                            handleVerifyFee(record.id, record.pendingFeePayment.id, "ACCEPT")
+                                          }
+                                          className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[10px] font-bold cursor-pointer disabled:opacity-50"
+                                        >
+                                          ✓ Setujui Denda
+                                        </button>
+                                        <button
+                                          disabled={isUpdating || !record.pendingFeePayment}
+                                          onClick={() =>
+                                            record.pendingFeePayment &&
+                                            handleVerifyFee(record.id, record.pendingFeePayment.id, "REJECT")
+                                          }
+                                          className="px-2 py-1 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold cursor-pointer disabled:opacity-50"
+                                        >
+                                          ✕ Tolak
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    /* Denda belum dibayar → inspeksi dikunci */
+                                    <div className="px-2 py-1.5 bg-rose-50 border border-rose-200 rounded-lg text-[10px] font-bold text-rose-700 text-right w-full sm:w-auto ml-auto">
+                                      🔒 Menunggu pembayaran denda keterlambatan dari pelanggan
+                                      {` (Rp ${Number(record.unpaidLateFee ?? record.lateFee ?? 0).toLocaleString("id-ID")})`}
+                                      . Terima pengembalian & inspeksi terkunci hingga denda dibayar &amp; disetujui.
+                                    </div>
+                                  )
+                                ) : (
+                                  <button
+                                    disabled={isUpdating}
+                                    onClick={() => setInspectionRental(record)}
+                                    className="w-full sm:w-auto px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                                  >
+                                    ✅ Terima Pengembalian &amp; Inspeksi
+                                  </button>
+                                )}
                                 {record.borrower.phone && (
                                   <a
                                     href={(() => {

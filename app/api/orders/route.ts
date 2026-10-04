@@ -43,7 +43,11 @@ export async function GET(request: Request) {
       // Denda keterlambatan otomatis berjalan (hari telat × tarif harian item)
       // selama barang belum dikembalikan dan sudah melewati jatuh tempo.
       const late = computeLateFee(o);
-      const effectiveLateFee = late.isLate ? late.lateFee : Number(o.lateFee || 0);
+      // Begitu denda dibayar (menunggu verifikasi) atau sudah disetujui (PAID),
+      // nilainya dibekukan ke angka tersimpan agar tidak terus bertambah.
+      const _fs = String(o.feeStatus || "").toUpperCase();
+      const lateFeeSettled = _fs === "PAID" || _fs === "PENDING_VERIFICATION";
+      const effectiveLateFee = late.isLate && !lateFeeSettled ? late.lateFee : Number(o.lateFee || 0);
 
       const feeBreakdown = calculateOrderFees({ ...o, lateFee: effectiveLateFee });
 
